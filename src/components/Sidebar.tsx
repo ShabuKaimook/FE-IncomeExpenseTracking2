@@ -15,6 +15,7 @@ interface NavItem {
   icon: LucideIcon;
 }
 
+// TODO: make the path as an enum
 const navItems: NavItem[] = [
   { label: "Home", to: "/", icon: Home },
   { label: "Transaction", to: "/transaction", icon: Receipt },
@@ -34,7 +35,7 @@ export const Sidebar = ({ isOpen, navbarHeight }: SidebarProps) => {
       {/* Panel */}
       <aside
         className={`z-20 w-50 flex flex-col gap-1 border-r p-4 overflow-hidden transition-all duration-300 ease-in-out bg-background rounded-2xl border
-          border-border absolute top-[${navbarHeight ?? 0}px] right-0 ${
+          border-muted-foreground shadow-xl absolute top-[${navbarHeight ?? 0}px] right-0 ${
             isOpen ? "" : "-translate-y-50 opacity-0 pointer-events-none"
           }`}
       >

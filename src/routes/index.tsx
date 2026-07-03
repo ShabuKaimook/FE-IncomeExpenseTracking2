@@ -1,8 +1,26 @@
+import { BarChart } from "#/components/charts/barchart";
 import { DashboardCard } from "#/components/DashboardCard";
+import { Link } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
-import { Wallet, ChartBarBig, TrendingUp, ChartNoAxesCombined } from "lucide-react";
+import {
+  Wallet,
+  ChartBarBig,
+  TrendingUp,
+  ChartNoAxesCombined,
+  Activity,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Home });
+
+const MOCK_SPENDING_TREND_DATA = [
+  { month: "Jan", expense: 10080 },
+  { month: "Feb", expense: 20092 },
+  { month: "Mar", expense: 8885 },
+  { month: "Apr", expense: 9997 },
+  { month: "May", expense: 19088 },
+  { month: "Jun", expense: 19295 },
+  { month: "Jul", expense: 11101 },
+];
 
 function Home() {
   return (
@@ -79,7 +97,7 @@ function Home() {
         />
 
         {/* Saving Card */}
-        <DashboardCard 
+        <DashboardCard
           header={{
             icon: <ChartNoAxesCombined size={16} className="text-primary" />,
             title: "SAVING",
@@ -93,6 +111,34 @@ function Home() {
             <div className="mt-2 flex w-full items-center justify-between border-t pt-3 text-xs text-muted-foreground lg:text-sm">
               <span>+4.1% from last month</span>
             </div>
+          }
+        />
+      </div>
+
+      {/* Chart Section */}
+      <div className="flex flex-col lg:flex-row gap-4 w-full">
+        {/* Spending Trend Chart */}
+        <DashboardCard
+          header={{
+            icon: <Activity size={16} className="text-primary" />,
+            title: "SPENDING TREND",
+          }}
+          rightSide={
+            <div className="flex items-center gap-2 text-xs lg:text-sm bg-primary/20 px-3 py-1 rounded-2xl">
+              {/* TODO: link the path */}
+              <Link to="/analytic" className="text-primary cursor-pointer">
+                <span className="text-primary cursor-pointer">View More</span>
+              </Link>
+            </div>
+          }
+          children={
+            <BarChart
+              data={MOCK_SPENDING_TREND_DATA}
+              xKey="month"
+              yKey="expense"
+              height={200}
+              showYAxis={true}
+            />
           }
         />
       </div>
