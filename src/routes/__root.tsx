@@ -69,7 +69,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <ClerkProvider>
           <div id="root-layout" className="p-4">
             <header>
-              <div className="frame relative">
+              <div className="frame relative mb-4">
                 <Navbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} navbarHeight={NAVBAR_HEIGHT} />
                 <Sidebar
                   isOpen={isMenuOpen}
