@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { resolveColor } from "#/utils/ResolveCSSColor";
 import {
   ResponsiveContainer,
   BarChart as RechartsBarChart,
@@ -25,12 +26,21 @@ interface BarChartProps<T extends Record<string, any>> {
   height?: number;
   showGrid?: boolean;
   showYAxis?: boolean;
-  color?: string;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
 }
 
-function resloveColor(color: string): string {
-  return getComputedStyle(document.documentElement).getPropertyValue(color);
-}
+const renderCustomBarLabel = ({ x, y, width, value }: any) => {
+  return (
+    <text
+      x={x + width / 2}
+      y={y}
+      fill="var(--muted-foreground)"
+      textAnchor="middle"
+      dy={-6}
+    >{`${value}`}</text>
+  );
+};
 
 export function BarChart<T extends Record<string, any>>({
   data,
@@ -39,6 +49,8 @@ export function BarChart<T extends Record<string, any>>({
   height = 240,
   showGrid = false,
   showYAxis = false,
+  xAxisLabel = "",
+  yAxisLabel = "",
 }: BarChartProps<T>) {
   const id = useId();
 
@@ -48,21 +60,38 @@ export function BarChart<T extends Record<string, any>>({
       height={height}
       className="text-xs lg:text-sm"
     >
-      <RechartsBarChart data={data}>
-        {showGrid && (
-          <CartesianGrid
-            vertical={false}
-            strokeDasharray="3 3"
-            stroke="#e5e7eb"
+      <RechartsBarChart
+        data={data}
+        margin={{ top: 20, right: 10, left: yAxisLabel !== "" ? 60 : 10, bottom: 20 }}
+      >
+        {showGrid && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
+
+        <XAxis
+          dataKey={xKey as string}
+          axisLine={false}
+          tickLine={false}
+          label={{
+            position: "centerBottom",
+            value: xAxisLabel,
+            dy: 20,
+          }}
+        />
+
+        {showYAxis && (
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            label={{
+              value: yAxisLabel,
+              angle: -90,
+              position: "centerTop",
+              dx: -60,
+            }}
           />
         )}
 
-        <XAxis dataKey={xKey as string} axisLine={false} tickLine={false} />
-
-        {showYAxis && <YAxis axisLine={false} tickLine={false} />}
-
         <Tooltip cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-        <Legend verticalAlign="top" align="right" />
+        {bars.length > 1 && <Legend verticalAlign="top" align="right" />}
 
         <defs>
           {bars.map((bar) => {
@@ -77,12 +106,12 @@ export function BarChart<T extends Record<string, any>>({
               >
                 <stop
                   offset="0%"
-                  stopColor={resloveColor(bar.color)}
+                  stopColor={resolveColor(bar.color)}
                   stopOpacity={1}
                 />
                 <stop
                   offset="100%"
-                  stopColor={resloveColor(bar.color)}
+                  stopColor={resolveColor(bar.color)}
                   stopOpacity={0.8}
                 />
               </linearGradient>
@@ -91,8 +120,6 @@ export function BarChart<T extends Record<string, any>>({
         </defs>
 
         {bars.map((bar) => {
-          console.log("color", bar.color, resloveColor(bar.color));
-
           return (
             <Bar
               key={bar.dataKey}
@@ -101,8 +128,9 @@ export function BarChart<T extends Record<string, any>>({
               fill={
                 bar.gradient
                   ? `url(#${id}-${bar.dataKey}-gradient)`
-                  : resloveColor(bar.color)
+                  : resolveColor(bar.color)
               }
+              label={renderCustomBarLabel}
               radius={[8, 8, 0, 0]}
             />
           );

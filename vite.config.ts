@@ -16,6 +16,11 @@ const config = defineConfig({
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
   ],
+  server: {
+    allowedHosts: [
+      "clapped-unpummelled-penni.ngrok-free.dev",
+    ],
+  },
 })
 
 export default config

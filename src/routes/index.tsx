@@ -8,19 +8,30 @@ import {
   TrendingUp,
   ChartNoAxesCombined,
   Activity,
+  ClockFading,
 } from "lucide-react";
 import { ChartTheme } from "#/constants/ChartTheme.enum";
+import { PieChart } from "#/components/charts/PieChart";
 
 export const Route = createFileRoute("/")({ component: Home });
 
 const MOCK_SPENDING_TREND_DATA = [
-  { month: "Jan", expense: 10080, income: 20000 },
-  { month: "Feb", expense: 20092, income: 25000 },
-  { month: "Mar", expense: 8885, income: 15000 },
-  { month: "Apr", expense: 9997, income: 18000 },
-  { month: "May", expense: 19088, income: 22000 },
-  { month: "Jun", expense: 19295, income: 51000 },
-  { month: "Jul", expense: 11101, income: 17000 },
+  { month: "Jan", expense: 10080 },
+  { month: "Feb", expense: 20092 },
+  { month: "Mar", expense: 8885 },
+  { month: "Apr", expense: 9997 },
+  { month: "May", expense: 19088 },
+  { month: "Jun", expense: 19295 },
+  { month: "Jul", expense: 11101 },
+];
+
+const MOCK_EXPENSE_CATEGORY_DATA = [
+  { name: "Food", value: 400 },
+  { name: "Transport", value: 300 },
+  { name: "Entertainment", value: 300 },
+  { name: "Health", value: 200 },
+  { name: "Education", value: 278 },
+  { name: "Others", value: 189 },
 ];
 
 function Home() {
@@ -117,7 +128,7 @@ function Home() {
       </div>
 
       {/* Chart Section */}
-      <div className="flex flex-col lg:flex-row gap-4 w-full">
+      <div className="flex flex-col sm:flex-row gap-4 w-full">
         {/* Spending Trend Chart */}
         <DashboardCard
           header={{
@@ -143,17 +154,28 @@ function Home() {
                   color: ChartTheme.destructive.color,
                   gradient: true,
                 },
-                {
-                  dataKey: "income",
-                  name: "Income",
-                  color: ChartTheme.primary.color,
-                  gradient: true,
-                },
               ]}
               height={200}
               showYAxis={true}
             />
           }
+        />
+
+        {/* Expesnse Category */}
+        <DashboardCard
+          header={{
+            icon: <ClockFading size={16} className="text-primary" />,
+            title: "EXPENSE CATEGORY",
+          }}
+          rightSide={
+            <div className="flex items-center gap-2 text-xs lg:text-sm bg-primary/20 px-3 py-1 rounded-2xl">
+              {/* TODO: link the path */}
+              <Link to="/analytic" className="text-primary cursor-pointer">
+                <span className="text-primary cursor-pointer">View More</span>
+              </Link>
+            </div>
+          }
+          children={<PieChart data={MOCK_EXPENSE_CATEGORY_DATA} width={"100%"} outerRadius={70} />}
         />
       </div>
     </div>
