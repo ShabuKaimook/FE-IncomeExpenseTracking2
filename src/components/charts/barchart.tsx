@@ -25,6 +25,7 @@ interface BarChartProps<T extends Record<string, any>> {
   bars: BarSeries[];
   height?: number;
   showGrid?: boolean;
+  showLabels?: boolean;
   showYAxis?: boolean;
   xAxisLabel?: string;
   yAxisLabel?: string;
@@ -49,6 +50,7 @@ export function BarChart<T extends Record<string, any>>({
   height = 240,
   showGrid = false,
   showYAxis = false,
+  showLabels = false,
   xAxisLabel = "",
   yAxisLabel = "",
 }: BarChartProps<T>) {
@@ -130,7 +132,7 @@ export function BarChart<T extends Record<string, any>>({
                   ? `url(#${id}-${bar.dataKey}-gradient)`
                   : resolveColor(bar.color)
               }
-              label={renderCustomBarLabel}
+              label={showLabels ? renderCustomBarLabel : undefined}
               radius={[8, 8, 0, 0]}
             />
           );

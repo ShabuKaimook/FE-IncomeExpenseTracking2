@@ -3,10 +3,8 @@ import {
   ResponsiveContainer,
   PieChart as RechartsPieChart,
   Cell,
-  Legend,
   Tooltip,
 } from "recharts";
-import type { PieLabelRenderProps } from "recharts";
 
 function hash(str: string) {
   let h = 0;
@@ -29,41 +27,79 @@ export interface PieChartProps {
   innerRadius?: number;
   outerRadius?: number;
   colors?: string[];
+  maxLegendItems?: number;
+}
+
+function formatPercent(value: number, total: number) {
+  if (total <= 0) {
+    return "0%";
+  }
+
+  return `${Math.round((value / total) * 100)}%`;
 }
 
 export function PieChart({
   data,
-  width = 200,
-  height = 200,
+  width = "100%",
+  height = 160,
   innerRadius = 40,
-  outerRadius = 80,
+  outerRadius = 60,
+  colors,
+  maxLegendItems = 4,
 }: PieChartProps) {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const chartSize = Math.max(height, outerRadius * 2 + 20);
+  const getColor = (entry: { name: string }, index: number) =>
+    colors?.[index] ?? colorFromName(entry.name);
+
   return (
-    <ResponsiveContainer width={width} height={height}>
-      <RechartsPieChart className="flex">
-        <Pie
-          data={data}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          isAnimationActive={true}
-        >
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={colorFromName(entry.name)} />
+    <div className="flex items-center gap-4" style={{ width }}>
+      <div className="shrink-0" style={{ width: chartSize, height: chartSize }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsPieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={innerRadius}
+              outerRadius={outerRadius}
+              paddingAngle={2}
+              isAnimationActive={true}
+            >
+              {data.map((entry, index) => (
+                <Cell key={entry.name} fill={getColor(entry, index)} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value, name) => [
+                `${value} (${formatPercent(Number(value), total)})`,
+                name,
+              ]}
+            />
+          </RechartsPieChart>
+        </ResponsiveContainer>
+      </div>
+
+      {data.length > 1 && (
+        <div className="min-w-0 flex-1 space-y-2">
+          {data.slice(0, maxLegendItems).map((entry, index) => (
+            <div key={entry.name} className="flex items-center gap-2">
+              <div
+                className="size-3 shrink-0 rounded-full"
+                style={{ backgroundColor: getColor(entry, index) }}
+              />
+              <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground lg:text-sm">
+                {entry.name}
+              </span>
+              <span className="text-xs font-medium text-foreground lg:text-sm">
+                {formatPercent(entry.value, total)}
+              </span>
+            </div>
           ))}
-        </Pie>
-        {data.length > 1 && (
-          <Legend
-            verticalAlign="top"
-            align="right"
-            layout="vertical"
-            iconType="circle"
-            formatter={(value) => (
-              <span className="text-xs lg:text-sm">{value}</span>
-            )}
-          />
-        )}
-        <Tooltip />
-      </RechartsPieChart>
-    </ResponsiveContainer>
+        </div>
+      )}
+    </div>
   );
 }
