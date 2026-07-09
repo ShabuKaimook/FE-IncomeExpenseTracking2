@@ -1,8 +1,8 @@
 import {
-  Pie,
-  ResponsiveContainer,
-  PieChart as RechartsPieChart,
   Cell,
+  Pie,
+  PieChart as RechartsPieChart,
+  ResponsiveContainer,
   Tooltip,
 } from "recharts";
 
@@ -41,12 +41,22 @@ function formatPercent(value: number, total: number) {
 export function PieChart({
   data,
   width = "100%",
-  height = 160,
+  height = 240,
   innerRadius = 40,
   outerRadius = 60,
   colors,
   maxLegendItems = 4,
 }: PieChartProps) {
+  if (data.length === 0) {
+    return (
+      <div
+        className={`flex w-full h-[${height}px] items-center justify-center`}
+      >
+        <span className="text-muted-foreground">No data available</span>
+      </div>
+    );
+  }
+
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const chartSize = Math.max(height, outerRadius * 2 + 20);
   const getColor = (entry: { name: string }, index: number) =>
