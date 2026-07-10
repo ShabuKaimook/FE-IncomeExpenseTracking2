@@ -23,15 +23,15 @@ export const DashboardCard = ({
 }: DashboardCardProps) => {
   return (
     <div
-      className={`flex flex-col items-start gap-2 rounded-xl border p-4 ${bgColor} w-full`}
+      className={`flex flex-col items-start gap-2 rounded-xl border p-4 ${bgColor} w-full min-w-0`}
     >
-      <div className="flex items-center justify-between w-full">
+      <div className="flex min-w-0 items-center justify-between w-full">
         {/* right side */}
         <div className="flex items-center gap-2">
           {header ? (
             <div className="flex items-center gap-2">
               {header.icon}
-              <span className="text-sm text-muted-foreground lg:text-lg">
+              <span className="text-sm text-muted-foreground lg:text-lg truncate">
                 {header.title}
               </span>
             </div>
