@@ -8,6 +8,7 @@ import {
 	Wallet,
 	WalletCards,
 } from "lucide-react";
+import { useMemo } from "react";
 import { BarChart } from "#/components/charts/Barchart";
 import { PieChart } from "#/components/charts/PieChart";
 import { DashboardCard } from "#/components/DashboardCard";
@@ -17,84 +18,143 @@ import {
 } from "#/components/TransactionCard";
 import { ChartTheme } from "#/constants/ChartTheme.enum";
 import { TRANSACTION_TYPE } from "#/constants/TransactionType.enum";
+import { MOCK_USER_ID } from "#/constants/user";
+import { useUserExpenseTotal } from "#/hooks/transactions/useUserExpenseTotal";
+import { useUserIncomeTotal } from "#/hooks/transactions/useUserIncomeTotal";
+import { useUserTransactions } from "#/hooks/transactions/useUserTransactions";
+import type { TransactionResponse } from "#/services/TransactionService/types/TransactionResponse";
+import { formatMoney } from "#/utils/FormatMoney";
+import { getThisMonthRange } from "#/utils/Month";
 
 export const Route = createFileRoute("/")({ component: Home });
 
-const MOCK_SPENDING_TREND_DATA = [
-	{ month: "Jan", expense: 10080 },
-	{ month: "Feb", expense: 20092 },
-	{ month: "Mar", expense: 8885 },
-	{ month: "Apr", expense: 9997 },
-	{ month: "May", expense: 19088 },
-	{ month: "Jun", expense: 19295 },
-	{ month: "Jul", expense: 11101 },
-];
+const mapTransaction = (transaction: TransactionResponse): Transaction => {
+	const isIncome =
+		transaction.transaction_type_id === TRANSACTION_TYPE.INCOME.id;
 
-const MOCK_EXPENSE_CATEGORY_DATA = [
-	{ name: "Food", value: 400 },
-	{ name: "Transport", value: 300 },
-	{ name: "Entertainment", value: 300 },
-	{ name: "Health", value: 200 },
-	{ name: "Education", value: 278 },
-	{ name: "Others", value: 189 },
-];
+	return {
+		id: transaction.transaction_id,
+		date: transaction.date,
+		description: transaction.description,
+		amount: transaction.amount,
+		currency: transaction.currency_code,
+		category: transaction.transaction_category_name,
+		type_id: isIncome
+			? TRANSACTION_TYPE.INCOME.id
+			: TRANSACTION_TYPE.EXPENSE.id,
+		type_name: transaction.transaction_type_name,
+	};
+};
 
-const MOCK_TRANSACTION_HISTORY_DATA: Transaction[] = [
-	{
-		id: 1,
-		date: "2023-07-01",
-		description: "Grocery Shopping",
-		amount: 50.25,
-		currency: "USD",
-		category: "Food",
-		type_id: TRANSACTION_TYPE.EXPENSE.id,
-    type_name: TRANSACTION_TYPE.EXPENSE.name,
-	},
-	{
-		id: 2,
-		date: "2023-07-02",
-		description: "Salary",
-		amount: 2000.0,
-		currency: "USD",
-		category: "Income",
-		type_id: TRANSACTION_TYPE.INCOME.id,
-    type_name: TRANSACTION_TYPE.INCOME.name,
-	},
-	{
-		id: 3,
-		date: "2023-07-03",
-		description: "Electricity Bill",
-		amount: 75.5,
-		currency: "USD",
-		category: "Utilities",
-		type_id: TRANSACTION_TYPE.EXPENSE.id,
-    type_name: TRANSACTION_TYPE.EXPENSE.name,
-	},
-	{
-		id: 4,
-		date: "2023-07-04",
-		description: "Dinner at Restaurant",
-		amount: 80.0,
-		currency: "USD",
-		category: "Food",
-		type_id: TRANSACTION_TYPE.EXPENSE.id,
-    type_name: TRANSACTION_TYPE.EXPENSE.name,
-	},
-	{
-		id: 5,
-		date: "2023-07-05",
-		description: "Freelance Project",
-		amount: 500.0,
-		currency: "USD",
-		category: "Income",
-		type_id: TRANSACTION_TYPE.INCOME.id,
-    type_name: TRANSACTION_TYPE.INCOME.name,
-	},
-];
+const getMonthLabel = (date: string) => {
+	const parsedDate = new Date(date);
+
+	if (Number.isNaN(parsedDate.getTime())) {
+		return date;
+	}
+
+	return parsedDate.toLocaleString("en-US", { month: "short" });
+};
+
+const getSpendingTrendData = (transactions: TransactionResponse[]) => {
+	const expenseByMonth = new Map<string, number>();
+
+	for (const transaction of transactions) {
+		if (transaction.transaction_type_id !== TRANSACTION_TYPE.EXPENSE.id) {
+			continue;
+		}
+
+		const month = getMonthLabel(transaction.date);
+		expenseByMonth.set(
+			month,
+			(expenseByMonth.get(month) ?? 0) + transaction.amount,
+		);
+	}
+
+	return Array.from(expenseByMonth.entries()).map(([month, expense]) => ({
+		expense,
+		month,
+	}));
+};
+
+const getExpenseCategoryData = (transactions: TransactionResponse[]) => {
+	const expenseByCategory = new Map<string, number>();
+
+	for (const transaction of transactions) {
+		if (transaction.transaction_type_id !== TRANSACTION_TYPE.EXPENSE.id) {
+			continue;
+		}
+
+		expenseByCategory.set(
+			transaction.transaction_category_name,
+			(expenseByCategory.get(transaction.transaction_category_name) ?? 0) +
+				transaction.amount,
+		);
+	}
+
+	return Array.from(expenseByCategory.entries()).map(([name, value]) => ({
+		name,
+		value,
+	}));
+};
 
 function Home() {
+	const thisMonthRange = getThisMonthRange();
+	const thisMonthCriteria = {
+		start_date: thisMonthRange.startDate,
+		end_date: thisMonthRange.endDate,
+	};
+
+	const {
+		error: transactionsError,
+		isLoading: isTransactionsLoading,
+		transactions,
+	} = useUserTransactions({
+		user_id: MOCK_USER_ID,
+		pagination: { limit: 5, offset: 0 },
+	});
+	const {
+		error: incomeError,
+		incomeTotal,
+		isLoading: isIncomeLoading,
+	} = useUserIncomeTotal({
+		user_id: MOCK_USER_ID,
+		criteria: thisMonthCriteria,
+	});
+	const {
+		error: expenseError,
+		expenseTotal,
+		isLoading: isExpenseLoading,
+	} = useUserExpenseTotal({
+		user_id: MOCK_USER_ID,
+		criteria: thisMonthCriteria,
+	});
+
+	const transactionHistoryData = useMemo(
+		() => transactions.map(mapTransaction),
+		[transactions],
+	);
+	const spendingTrendData = useMemo(
+		() => getSpendingTrendData(transactions),
+		[transactions],
+	);
+	const expenseCategoryData = useMemo(
+		() => getExpenseCategoryData(transactions),
+		[transactions],
+	);
+	const currency = transactionHistoryData[0]?.currency ?? "THB";
+	const netBalance = incomeTotal - expenseTotal;
+	const isSummaryLoading = isIncomeLoading || isExpenseLoading;
+	const hasDashboardError = transactionsError || incomeError || expenseError;
+
 	return (
 		<div className="flex flex-col items-center justify-center gap-4">
+			{hasDashboardError && (
+				<div className="w-full rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+					Unable to load dashboard data from the backend.
+				</div>
+			)}
+
 			{/* Net, Income, Expense, Saving Rate Section */}
 			<div className="flex flex-col lg:flex-row gap-4 w-full">
 				{/* Net Card */}
@@ -105,20 +165,27 @@ function Home() {
 					}}
 					rightSide={
 						<div className="flex items-center gap-2 text-xs lg:text-sm bg-primary/20 px-3 py-1 rounded-2xl">
-							<span className="text-primary">Positive</span>
+							<span className="text-primary">
+								{netBalance > 0
+									? "Positive"
+									: netBalance < 0
+										? "Negative"
+										: "Neutral"}
+							</span>
 						</div>
-					}
-					children={
-						<span className="text-2xl font-bold text-primary lg:text-4xl">
-							$ 0.00
-						</span>
 					}
 					bottomSide={
 						<div className="mt-2 flex w-full items-center justify-between border-t pt-3 text-xs text-muted-foreground lg:text-sm">
 							<span>Last updated: Today</span>
 						</div>
 					}
-				/>
+				>
+					<span className="text-2xl font-bold text-primary lg:text-4xl">
+						{isSummaryLoading
+							? "Loading..."
+							: formatMoney(netBalance, currency)}
+					</span>
+				</DashboardCard>
 
 				{/* Income/Expense Card */}
 				<DashboardCard
@@ -126,42 +193,41 @@ function Home() {
 						icon: <ChartBarBig size={16} className="text-primary" />,
 						title: "INCOME & EXPENSE",
 					}}
-					children={
-						<div className="flex gap-4 w-full">
-							<DashboardCard
-								leftSide={
-									<span className="text-xs text-muted-foreground lg:text-sm">
-										Income
-									</span>
-								}
-								rightSide={<TrendingUp size={16} className="text-primary" />}
-								bgColor="bg-linear-[150deg] from-primary/50 to-primary/10 text-white"
-								children={
-									<span className="text-lg font-bold text-muted-foreground lg:text-xl">
-										$ 0.00
-									</span>
-								}
-							/>
+				>
+					<div className="flex gap-4 w-full">
+						<DashboardCard
+							leftSide={
+								<span className="text-xs text-muted-foreground lg:text-sm">
+									Income
+								</span>
+							}
+							rightSide={<TrendingUp size={16} className="text-primary" />}
+							bgColor="bg-linear-[150deg] from-primary/50 to-primary/10 text-white"
+						>
+							<span className="text-lg font-bold text-muted-foreground lg:text-xl">
+								{isIncomeLoading
+									? "Loading..."
+									: formatMoney(incomeTotal, currency)}
+							</span>
+						</DashboardCard>
 
-							<DashboardCard
-								leftSide={
-									<span className="text-xs text-muted-foreground lg:text-sm">
-										Expense
-									</span>
-								}
-								rightSide={
-									<TrendingUp size={16} className="text-destructive" />
-								}
-								bgColor="bg-linear-[150deg] from-destructive/50 to-destructive/10 text-white"
-								children={
-									<span className="text-lg font-bold text-muted-foreground lg:text-xl">
-										$ 0.00
-									</span>
-								}
-							/>
-						</div>
-					}
-				/>
+						<DashboardCard
+							leftSide={
+								<span className="text-xs text-muted-foreground lg:text-sm">
+									Expense
+								</span>
+							}
+							rightSide={<TrendingUp size={16} className="text-destructive" />}
+							bgColor="bg-linear-[150deg] from-destructive/50 to-destructive/10 text-white"
+						>
+							<span className="text-lg font-bold text-muted-foreground lg:text-xl">
+								{isExpenseLoading
+									? "Loading..."
+									: formatMoney(expenseTotal, currency)}
+							</span>
+						</DashboardCard>
+					</div>
+				</DashboardCard>
 
 				{/* Saving Card */}
 				<DashboardCard
@@ -169,17 +235,18 @@ function Home() {
 						icon: <ChartNoAxesCombined size={16} className="text-primary" />,
 						title: "SAVING",
 					}}
-					children={
-						<span className="text-2xl font-bold text-primary lg:text-4xl">
-							$ 0.00
-						</span>
-					}
 					bottomSide={
 						<div className="mt-2 flex w-full items-center justify-between border-t pt-3 text-xs text-muted-foreground lg:text-sm">
 							<span>+4.1% from last month</span>
 						</div>
 					}
-				/>
+				>
+					<span className="text-2xl font-bold text-primary lg:text-4xl">
+						{isSummaryLoading
+							? "Loading..."
+							: formatMoney(Math.max(netBalance, 0), currency)}
+					</span>
+				</DashboardCard>
 			</div>
 
 			{/* Chart Section */}
@@ -194,27 +261,28 @@ function Home() {
 						<div className="flex items-center gap-2 text-xs lg:text-sm bg-primary/20 px-3 py-1 rounded-2xl">
 							{/* TODO: link the path */}
 							<Link to="/analytic" className="text-primary cursor-pointer">
-								<span className="text-primary cursor-pointer">View More</span>
+								<span className="text-primary cursor-pointer truncate">
+									View More
+								</span>
 							</Link>
 						</div>
 					}
-					children={
-						<BarChart
-							data={MOCK_SPENDING_TREND_DATA}
-							xKey="month"
-							bars={[
-								{
-									dataKey: "expense",
-									name: "Expense",
-									color: ChartTheme.destructive.color,
-									gradient: true,
-								},
-							]}
-							height={200}
-							showYAxis={true}
-						/>
-					}
-				/>
+				>
+					<BarChart
+						data={isTransactionsLoading ? [] : spendingTrendData}
+						xKey="month"
+						bars={[
+							{
+								dataKey: "expense",
+								name: "Expense",
+								color: ChartTheme.destructive.color,
+								gradient: true,
+							},
+						]}
+						height={200}
+						showYAxis={true}
+					/>
+				</DashboardCard>
 
 				{/* Expesnse Category */}
 				<DashboardCard
@@ -230,15 +298,14 @@ function Home() {
 							</Link>
 						</div>
 					}
-					children={
-						<PieChart
-							data={MOCK_EXPENSE_CATEGORY_DATA}
-							width={"100%"}
-							outerRadius={70}
-							height={200}
-						/>
-					}
-				/>
+				>
+					<PieChart
+						data={isTransactionsLoading ? [] : expenseCategoryData}
+						width={"100%"}
+						outerRadius={70}
+						height={200}
+					/>
+				</DashboardCard>
 			</div>
 
 			<DashboardCard
@@ -246,17 +313,24 @@ function Home() {
 					icon: <WalletCards size={16} className="text-primary" />,
 					title: "TRANSACTION HISTORY",
 				}}
-
-        rightSide={
-						<div className="flex items-center gap-2 text-xs lg:text-sm bg-primary/20 px-3 py-1 rounded-2xl">
-							{/* TODO: link the path */}
-							<Link to="/transaction" className="text-primary cursor-pointer">
-								<span className="text-primary cursor-pointer">View More</span>
-							</Link>
-						</div>
-					}
+				rightSide={
+					<div className="flex items-center gap-2 text-xs lg:text-sm bg-primary/20 px-3 py-1 rounded-2xl">
+						{/* TODO: link the path */}
+						<Link to="/transaction" className="text-primary cursor-pointer">
+							<span className="text-primary cursor-pointer">View More</span>
+						</Link>
+					</div>
+				}
 			>
-				<TransactionCard transactions={MOCK_TRANSACTION_HISTORY_DATA} />
+				{isTransactionsLoading ? (
+					<div className="flex min-h-24 w-full items-center justify-center">
+						<span className="text-sm text-muted-foreground">
+							Loading transactions...
+						</span>
+					</div>
+				) : (
+					<TransactionCard transactions={transactionHistoryData} />
+				)}
 			</DashboardCard>
 		</div>
 	);

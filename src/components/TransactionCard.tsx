@@ -1,4 +1,5 @@
 import { TRANSACTION_TYPE } from "@/constants/TransactionType.enum";
+import { formatMoney } from "@/utils/FormatMoney";
 
 type TransactionTypeId =
 	(typeof TRANSACTION_TYPE)[keyof typeof TRANSACTION_TYPE]["id"];
@@ -21,13 +22,9 @@ interface TransactionCardProps {
 }
 
 const formatAmount = (transaction: Transaction) => {
-	const formatter = new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: transaction.currency,
-	});
-
-	return `${transaction.type_id === TRANSACTION_TYPE.INCOME.id ? "+" : "-"}${formatter.format(
+	return `${transaction.type_id === TRANSACTION_TYPE.INCOME.id ? "+" : "-"}${formatMoney(
 		transaction.amount,
+		transaction.currency,
 	)}`;
 };
 
