@@ -2,10 +2,11 @@ import { axiosInstance } from "@/services/http/axiosInstance";
 import type {
 	CreateTransactionRequest,
 	GetTransactionRequest,
+	GetUserExpenseSummaryRequest,
 	GetUserExpenseTotalRequest,
 	GetUserIncomeTotalRequest,
 } from "./types/TransactionRequest";
-import type { TransactionResponse } from "./types/TransactionResponse";
+import type { GetUserExpenseSummaryResponse, TransactionResponse } from "./types/TransactionResponse";
 
 export const TransactionService = {
 	createTransaction: async (body: CreateTransactionRequest): Promise<void> => {
@@ -45,6 +46,17 @@ export const TransactionService = {
 		const response = await axiosInstance.post<number>(
 			`/transaction/user/${user_id}/expense`,
 			body,
+		);
+
+		return response.data;
+	},
+
+	getUserExpenseSummary: async (
+		req: GetUserExpenseSummaryRequest,
+	): Promise<GetUserExpenseSummaryResponse[]> => {
+		const response = await axiosInstance.post<GetUserExpenseSummaryResponse[]>(
+			`/transaction/expense/summary`,
+			req,
 		);
 
 		return response.data;
