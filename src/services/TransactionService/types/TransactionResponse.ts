@@ -15,3 +15,7 @@ export interface GetUserTransactionSummaryResponse {
 	end_date: string;
 	total_amount: number;
 }
+
+export interface GetUserSavingRateResponse {
+	saving_rate: number;
+}

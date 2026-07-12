@@ -39,3 +39,8 @@ export interface GetUserExpenseSummaryRequest {
 	period_mode: PeriodMode;
 	periods: Period[]
 }
+
+export interface GetUserSavingRateRequest {
+	user_id: string;
+	periods: Period[];
+}

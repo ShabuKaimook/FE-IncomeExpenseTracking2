@@ -87,7 +87,7 @@ export default function DashboardPage() {
         />
 
         {/* Saving Card */}
-        <SavingRateDashboardCard currency={currency} />
+        <SavingRateDashboardCard />
       </div>
 
       {/* Chart Section */}

@@ -5,12 +5,19 @@ import type {
 	GetUserExpenseSummaryRequest,
 	GetUserExpenseTotalRequest,
 	GetUserIncomeTotalRequest,
+	GetUserSavingRateRequest,
 } from "./types/TransactionRequest";
-import type { GetUserTransactionSummaryResponse, TransactionResponse } from "./types/TransactionResponse";
+import type {
+	GetUserSavingRateResponse,
+	GetUserTransactionSummaryResponse,
+	TransactionResponse,
+} from "./types/TransactionResponse";
+
+const TRANSACTION_PREFIX = "/transaction";
 
 export const TransactionService = {
 	createTransaction: async (body: CreateTransactionRequest): Promise<void> => {
-		await axiosInstance.post("/transaction/create", body);
+		await axiosInstance.post(`${TRANSACTION_PREFIX}/create`, body);
 	},
 
 	getUserTransactions: async (
@@ -19,7 +26,7 @@ export const TransactionService = {
 		const { user_id, ...body } = req;
 
 		const response = await axiosInstance.post<TransactionResponse[]>(
-			`/transaction/user/${user_id}`,
+			`${TRANSACTION_PREFIX}/user/${user_id}`,
 			body,
 		);
 
@@ -32,7 +39,7 @@ export const TransactionService = {
 		const { user_id, ...body } = req;
 
 		const response = await axiosInstance.post<number>(
-			`/transaction/user/${user_id}/income`,
+			`${TRANSACTION_PREFIX}/user/${user_id}/income`,
 			body,
 		);
 
@@ -44,7 +51,7 @@ export const TransactionService = {
 	): Promise<number> => {
 		const { user_id, ...body } = req;
 		const response = await axiosInstance.post<number>(
-			`/transaction/user/${user_id}/expense`,
+			`${TRANSACTION_PREFIX}/user/${user_id}/expense`,
 			body,
 		);
 
@@ -54,8 +61,18 @@ export const TransactionService = {
 	getUserExpenseSummary: async (
 		req: GetUserExpenseSummaryRequest,
 	): Promise<GetUserTransactionSummaryResponse[]> => {
-		const response = await axiosInstance.post<GetUserTransactionSummaryResponse[]>(
-			`/transaction/expense/summary`,
+		const response = await axiosInstance.post<
+			GetUserTransactionSummaryResponse[]
+		>(`${TRANSACTION_PREFIX}/expense/summary`, req);
+
+		return response.data;
+	},
+
+	getUserSavingRate: async (
+		req: GetUserSavingRateRequest,
+	): Promise<GetUserSavingRateResponse> => {
+		const response = await axiosInstance.post<GetUserSavingRateResponse>(
+			`${TRANSACTION_PREFIX}/saving-rate`,
 			req,
 		);
 

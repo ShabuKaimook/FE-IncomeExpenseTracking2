@@ -3,6 +3,7 @@ import type {
   GetUserExpenseTotalRequest,
   GetUserIncomeTotalRequest,
   GetUserExpenseSummaryRequest,
+  GetUserSavingRateRequest,
 } from "#/services/TransactionService/types/TransactionRequest";
 
 export const transactionKeys = {
@@ -16,4 +17,6 @@ export const transactionKeys = {
     [...transactionKeys.all, "expense-total", req] as const,
   expenseSummary: (req: GetUserExpenseSummaryRequest) =>
     [...transactionKeys.all, "expense-summary", req] as const,
+  savingRate: (req: GetUserSavingRateRequest) =>
+    [...transactionKeys.all, "saving-rate", req] as const,
 };
