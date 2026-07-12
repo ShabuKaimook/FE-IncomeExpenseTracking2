@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { useState } from "react";
+import { GlobalToast } from "#/components/GlobalToast";
 import Navbar from "#/components/Navbar";
 import { Sidebar } from "#/components/Sidebar";
 import ClerkProvider from "../integrations/clerk/provider";
@@ -64,6 +65,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body>
+				<GlobalToast />
 				<ClerkProvider>
 					<QueryClientProvider client={queryClient}>
 						<div id="root-layout" className="p-4">

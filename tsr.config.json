@@ -1,3 +1,4 @@
 {
-  "target": "react"
+	"routeFileIgnorePattern": "index\\.tsx",
+	"target": "react"
 }
