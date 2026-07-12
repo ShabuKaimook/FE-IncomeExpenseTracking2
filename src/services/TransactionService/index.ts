@@ -6,7 +6,7 @@ import type {
 	GetUserExpenseTotalRequest,
 	GetUserIncomeTotalRequest,
 } from "./types/TransactionRequest";
-import type { GetUserExpenseSummaryResponse, TransactionResponse } from "./types/TransactionResponse";
+import type { GetUserTransactionSummaryResponse, TransactionResponse } from "./types/TransactionResponse";
 
 export const TransactionService = {
 	createTransaction: async (body: CreateTransactionRequest): Promise<void> => {
@@ -53,8 +53,8 @@ export const TransactionService = {
 
 	getUserExpenseSummary: async (
 		req: GetUserExpenseSummaryRequest,
-	): Promise<GetUserExpenseSummaryResponse[]> => {
-		const response = await axiosInstance.post<GetUserExpenseSummaryResponse[]>(
+	): Promise<GetUserTransactionSummaryResponse[]> => {
+		const response = await axiosInstance.post<GetUserTransactionSummaryResponse[]>(
 			`/transaction/expense/summary`,
 			req,
 		);

@@ -3,8 +3,6 @@ import { WalletCards } from "lucide-react";
 import { DashboardCard } from "#/components/DashboardCard";
 import { LoadingSpinner } from "#/components/LoadingSpinner";
 import { TransactionCard } from "#/components/TransactionCard";
-import { useUserTransactions } from "#/hooks/transactions/useUserTransactions";
-import { MOCK_USER_ID } from "#/constants/user";
 import { useMemo, useEffect } from "react";
 import { toast } from "react-toastify";
 import { TRANSACTION_TYPE } from "#/constants/TransactionType.enum";
@@ -29,27 +27,26 @@ const mapTransaction = (transaction: TransactionResponse): Transaction => {
   };
 };
 
-export const TransactionHistoryDashboardCard = () => {
-  const {
-    error: transactionsError,
-    isLoading: isTransactionsLoading,
-    transactions,
-  } = useUserTransactions({
-    user_id: MOCK_USER_ID,
-    pagination: { limit: 5, offset: 0 },
-  });
-
+export const TransactionHistoryDashboardCard = ({
+  transactions,
+  isTransactionsLoading,
+  transactionsError,
+}: {
+  transactions: TransactionResponse[];
+  isTransactionsLoading: boolean;
+  transactionsError: Error | null;
+}) => {
   const transactionHistoryData = useMemo(
     () => transactions.map(mapTransaction),
     [transactions],
   );
-  
+
   useEffect(() => {
     if (transactionsError) {
       toast.error("Failed to load transactions");
     }
   }, [transactionsError]);
-  
+
   return (
     <DashboardCard
       header={{

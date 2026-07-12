@@ -9,3 +9,9 @@ export interface TransactionResponse {
 	description: string;
 	date: string;
 }
+
+export interface GetUserTransactionSummaryResponse {
+	start_date: string;
+	end_date: string;
+	total_amount: number;
+}

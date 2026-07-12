@@ -1,3 +1,6 @@
+import type { PeriodMode } from "#/constants/period";
+import type { Period } from "#/types/period";
+
 export interface CreateTransactionRequest {
 	amount: number;
 	currency_code: "THB" | "USD";
@@ -29,4 +32,10 @@ export interface GetUserExpenseTotalRequest {
 		start_date?: Date;
 		end_date?: Date;
 	};
+}
+
+export interface GetUserExpenseSummaryRequest {
+	user_id: string;
+	period_mode: PeriodMode;
+	periods: Period[]
 }

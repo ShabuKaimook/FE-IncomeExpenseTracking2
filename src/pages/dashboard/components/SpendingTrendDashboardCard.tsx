@@ -3,7 +3,7 @@ import { Activity } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { BarChart } from "#/components/charts/Barchart";
 import { ChartTheme } from "#/constants/ChartTheme.enum";
-import type { GetUserExpenseSummaryResponse } from "#/services/TransactionService/types/TransactionResponse";
+import type { GetUserTransactionSummaryResponse } from "#/services/TransactionService/types/TransactionResponse";
 import { useUserExpenseSummary } from "#/hooks/transactions/useUserExpenseSummary";
 import { MOCK_USER_ID } from "#/constants/user";
 import { PERIOD_MODE } from "#/constants/period.ts";
@@ -57,9 +57,9 @@ export const SpendingTrendDashboardCard = () => {
           isExpenseSummaryLoading
             ? []
             : expenseSummary?.map(
-                (item: GetUserExpenseSummaryResponse, index) => ({
+                (item: GetUserTransactionSummaryResponse, index) => ({
                   week: `Week ${index + 1}`,
-                  expense: item.total_expense,
+                  expense: item.total_amount,
                 }),
               ) || []
         }

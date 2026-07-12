@@ -5,12 +5,14 @@ import { formatMoney } from "#/utils/FormatMoney";
 
 interface NetBalanceDashboardCardProps {
 	netBalance: number;
+	lastUpdated: string;
 	currency: string;
 	isLoading: boolean;
 }
 
 export const NetBalanceDashboardCard = ({
 	netBalance,
+	lastUpdated,
 	currency,
 	isLoading,
 }: NetBalanceDashboardCardProps) => {
@@ -33,7 +35,7 @@ export const NetBalanceDashboardCard = ({
 			}
 			bottomSide={
 				<div className="mt-2 flex w-full items-center justify-between border-t pt-3 text-xs text-muted-foreground lg:text-sm">
-					<span>Last updated: Today</span>
+					<span>Last updated: {lastUpdated}</span>
 				</div>
 			}
 		>

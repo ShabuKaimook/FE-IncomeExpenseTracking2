@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useUserTransactions } from "#/hooks/transactions/useUserTransactions";
 import { toast } from "react-toastify";
 import { MOCK_USER_ID } from "#/constants/user";
 import { useUserExpenseTotal } from "#/hooks/transactions/useUserExpenseTotal";
@@ -10,6 +11,7 @@ import { SpendingTrendDashboardCard } from "./components/SpendingTrendDashboardC
 import { TransactionHistoryDashboardCard } from "./components/TransactionHistoryDashboardCard";
 import ExpenseCategorySummaryDashboard from "./components/ExpenseCategorySummaryDashboard";
 import { SavingRateDashboardCard } from "./components/SavingRateDashboardCard";
+import { formatRelativeDate } from "#/utils/FormatDate";
 
 export default function DashboardPage() {
   const thisMonthRange = getThisMonthRange();
@@ -36,12 +38,22 @@ export default function DashboardPage() {
     user_id: MOCK_USER_ID,
     criteria: thisMonthCriteria,
   });
-	
+
+  const {
+    error: transactionsError,
+    isLoading: isTransactionsLoading,
+    transactions,
+  } = useUserTransactions({
+    user_id: MOCK_USER_ID,
+    pagination: { limit: 5, offset: 0 }, // TODO: need to fetch the latest 5 transactions
+  });
+
   const netBalance = incomeTotal - expenseTotal;
-  const isNetBalanceLoading = isIncomeLoading || isExpenseLoading;
+  const isNetBalanceLoading =
+    isIncomeLoading || isExpenseLoading || isTransactionsLoading;
 
   const currency = "THB"; // TODO: Fetch the user's preferred currency from the backend or user settings
-  const hasDashboardError = incomeError || expenseError;
+  const hasDashboardError = incomeError || expenseError || transactionsError;
 
   useEffect(() => {
     if (!hasDashboardError) {
@@ -60,6 +72,7 @@ export default function DashboardPage() {
         {/* Net Card */}
         <NetBalanceDashboardCard
           netBalance={netBalance}
+					lastUpdated={transactions && transactions.length > 0 ? formatRelativeDate(transactions[0].date) : "N/A"}
           currency={currency}
           isLoading={isNetBalanceLoading}
         />
@@ -86,7 +99,11 @@ export default function DashboardPage() {
         <ExpenseCategorySummaryDashboard />
       </div>
 
-      <TransactionHistoryDashboardCard />
+      <TransactionHistoryDashboardCard
+        transactions={transactions}
+        isTransactionsLoading={isTransactionsLoading}
+        transactionsError={transactionsError}
+      />
     </div>
   );
 }
