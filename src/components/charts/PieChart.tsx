@@ -92,24 +92,22 @@ export function PieChart({
         </ResponsiveContainer>
       </div>
 
-      {data.length > 1 && (
-        <div className="min-w-0 flex-1 space-y-2">
-          {data.slice(0, maxLegendItems).map((entry, index) => (
-            <div key={entry.name} className="flex items-center gap-2">
-              <div
-                className="size-3 shrink-0 rounded-full"
-                style={{ backgroundColor: getColor(entry, index) }}
-              />
-              <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground lg:text-sm">
-                {entry.name}
-              </span>
-              <span className="text-xs font-medium text-foreground lg:text-sm">
-                {formatPercent(entry.value, total)}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="min-w-0 flex-1 space-y-2">
+        {data.slice(0, maxLegendItems).map((entry, index) => (
+          <div key={entry.name} className="flex items-center gap-2">
+            <div
+              className="size-3 shrink-0 rounded-full"
+              style={{ backgroundColor: getColor(entry, index) }}
+            />
+            <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground lg:text-sm">
+              {entry.name}
+            </span>
+            <span className="text-xs font-medium text-foreground lg:text-sm">
+              {formatPercent(entry.value, total)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
