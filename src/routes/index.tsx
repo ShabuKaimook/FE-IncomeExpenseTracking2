@@ -1,5 +1,5 @@
 import { createRoute } from "@tanstack/react-router";
-import DashboardPage from "#/pages/dashboard";
+import DashboardPage from "@/features/dashboard/DashboardPage";
 import { Route as rootRoute } from "./__root";
 
 const dashboardRoute = createRoute({
@@ -9,9 +9,12 @@ const dashboardRoute = createRoute({
 });
 
 const transactionRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/transactions",
-  component: DashboardPage, // TODO: Replace with the actual component for the transactions page
+	getParentRoute: () => rootRoute,
+	path: "/transactions",
+	component: DashboardPage, // TODO: Replace with the actual component for the transactions page
 });
 
-export const routeTree = rootRoute.addChildren([dashboardRoute, transactionRoute]);
+export const routeTree = rootRoute.addChildren([
+	dashboardRoute,
+	transactionRoute,
+]);

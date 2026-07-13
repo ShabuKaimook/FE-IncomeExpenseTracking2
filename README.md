@@ -5,8 +5,8 @@ Welcome to your new TanStack Start app!
 To run this application:
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 # Building For Production
@@ -14,7 +14,7 @@ npm run dev
 To build this application for production:
 
 ```bash
-npm run build
+bun run build
 ```
 
 ## Testing
@@ -22,7 +22,7 @@ npm run build
 This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
 
 ```bash
-npm run test
+bun test
 ```
 
 ## Styling
@@ -44,9 +44,9 @@ This project uses [Biome](https://biomejs.dev/) for linting and formatting. The 
 
 
 ```bash
-npm run lint
-npm run format
-npm run check
+bun run lint
+bun run format
+bun run check
 ```
 
 
@@ -58,7 +58,7 @@ npm run check
    ```bash
    VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
    ```
-4. Visit the demo route at `/demo/clerk` once `npm run dev` is running
+4. Visit the demo route at `/demo/clerk` once `bun run dev` is running
 
 ### What's wired up
 
@@ -101,7 +101,7 @@ For server-side checks (route loaders, server functions), see the Clerk docs on 
 Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
 
 ```bash
-pnpm dlx shadcn@latest add button
+bunx shadcn@latest add button
 ```
 
 

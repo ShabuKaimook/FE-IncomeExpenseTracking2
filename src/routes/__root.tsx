@@ -8,9 +8,9 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { useState } from "react";
-import { GlobalToast } from "#/components/GlobalToast";
-import Navbar from "#/components/Navbar";
-import { Sidebar } from "#/components/Sidebar";
+import { GlobalToast } from "@/shared/components/GlobalToast";
+import Navbar from "@/shared/components/Navbar";
+import { Sidebar } from "@/shared/components/Sidebar";
 import ClerkProvider from "../integrations/clerk/provider";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import { queryClient } from "../integrations/tanstack-query/root-provider";
