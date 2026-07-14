@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { useUserSavingRate } from "@/features/transactions/hooks/useUserSavingRate";
 import { DashboardCard } from "@/shared/components/DashboardCard";
-import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
+import { Skeleton } from "@/shared/components/Skeleton";
 import { MOCK_USER_ID } from "@/shared/constants/User";
 import { getLastMonthRange, getThisMonthRange } from "@/shared/utils/Month";
 
@@ -53,13 +53,20 @@ export const SavingRateDashboardCard = () => {
 			}}
 			bottomSide={
 				<div className="mt-2 flex w-full items-center justify-between border-t pt-3 text-xs text-muted-foreground lg:text-sm">
-					<span>{`${(savingRate - lastMonthSavingRate).toFixed(2)}% from last month`}</span>
+					{isThisLoading || isLastMonthLoading ? (
+						<Skeleton className="h-4 w-36" label="Loading saving trend" />
+					) : (
+						<span>{`${(savingRate - lastMonthSavingRate).toFixed(2)}% from last month`}</span>
+					)}
 				</div>
 			}
 		>
 			<span className="text-2xl font-bold text-primary lg:text-4xl">
 				{isThisLoading || isLastMonthLoading ? (
-					<LoadingSpinner size={32} label="Loading saving total" />
+					<Skeleton
+						className="h-10 w-28 rounded-lg"
+						label="Loading saving total"
+					/>
 				) : (
 					`${savingRate.toFixed(2)}%`
 				)}

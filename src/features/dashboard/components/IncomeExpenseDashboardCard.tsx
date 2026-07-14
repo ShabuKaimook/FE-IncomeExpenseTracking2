@@ -1,89 +1,114 @@
 import { ChartBarBig, TrendingDown, TrendingUp } from "lucide-react";
 import { DashboardCard } from "@/shared/components/DashboardCard";
-import { LoadingSpinner } from "@/shared/components/LoadingSpinner";
+import { Skeleton } from "@/shared/components/Skeleton";
 import { formatMoney } from "@/shared/utils/FormatMoney";
 
 export const IncomeExpenseDashboardCard = ({
-	isIncomeLoading,
-	incomeTotal,
-	isExpenseLoading,
-	expenseTotal,
-	currency,
+  isIncomeLoading,
+  incomeTotal,
+  isExpenseLoading,
+  expenseTotal,
+  currency,
 }: {
-	isIncomeLoading: boolean;
-	incomeTotal: number;
-	isExpenseLoading: boolean;
-	expenseTotal: number;
-	currency: string;
+  isIncomeLoading: boolean;
+  incomeTotal: number;
+  isExpenseLoading: boolean;
+  expenseTotal: number;
+  currency: string;
 }) => {
-	return (
-		<DashboardCard
-			header={{
-				icon: <ChartBarBig size={16} className="text-primary" />,
-				title: "INCOME & EXPENSE",
-			}}
-		>
-			<div className="flex gap-4 w-full">
-				<IncomeExpenseCard
-					title="Income"
-					icon={<TrendingUp size={16} className="text-primary" />}
-					isLoading={isIncomeLoading}
-					amount={incomeTotal}
-					currency={currency}
-				/>
+  return (
+    <DashboardCard
+      header={{
+        icon: <ChartBarBig size={16} className="text-primary" />,
+        title: "INCOME & EXPENSE",
+      }}
+    >
+      <div className="flex gap-4 w-full">
+        <IncomeExpenseCard
+          title="Income"
+          icon={<TrendingUp size={16} className="text-primary" />}
+          isLoading={isIncomeLoading}
+          amount={incomeTotal}
+          currency={currency}
+        />
 
-				<IncomeExpenseCard
-					title="Expense"
-					icon={<TrendingDown size={16} className="text-primary" />}
-					bg="bg-linear-[150deg] from-destructive/50 to-destructive/10 text-white"
-					isLoading={isExpenseLoading}
-					amount={expenseTotal}
-					currency={currency}
-				/>
-			</div>
-		</DashboardCard>
-	);
+        <IncomeExpenseCard
+          title="Expense"
+          icon={<TrendingDown size={16} className="text-primary" />}
+          bg="bg-linear-[150deg] from-destructive/50 to-destructive/10 text-white"
+          isLoading={isExpenseLoading}
+          amount={expenseTotal}
+          currency={currency}
+        />
+      </div>
+    </DashboardCard>
+  );
 };
 
 const IncomeExpenseCard = ({
-	title,
-	icon,
-	bg,
-	isLoading,
-	amount,
-	currency,
+  title,
+  icon,
+  bg,
+  isLoading,
+  amount,
+  currency,
 }: {
-	title: string;
-	icon: React.ReactNode;
-	bg?: string;
-	isLoading: boolean;
-	amount: number;
-	currency: string;
+  title: string;
+  icon: React.ReactNode;
+  bg?: string;
+  isLoading: boolean;
+  amount: number;
+  currency: string;
 }) => {
-	return (
-		<DashboardCard
-			leftSide={
-				<span className="text-xs text-muted-foreground lg:text-sm">
-					{title}
-				</span>
-			}
-			rightSide={icon}
-			bgColor={
-				bg ?? "bg-linear-[150deg] from-primary/50 to-primary/10 text-white"
-			}
-		>
-			<span className="text-lg font-bold text-muted-foreground lg:text-xl">
-				{isLoading ? (
-					<LoadingSpinner
-						size={20}
-						label={`Loading ${title.toLowerCase()} total`}
-					/>
-				) : (
-					formatMoney(amount, currency)
-				)}
-			</span>
-		</DashboardCard>
-	);
+  return (
+    <>
+      {isLoading ? (
+        <Skeleton
+          className="h-21 w-full"
+          label={`Loading ${title.toLowerCase()} total`}
+        />
+      ) : (
+        <DashboardCard
+          leftSide={
+            <span className="text-xs text-muted-foreground lg:text-sm">
+              {title}
+            </span>
+          }
+          rightSide={icon}
+          bgColor={
+            bg ?? "bg-linear-[150deg] from-primary/50 to-primary/10 text-white"
+          }
+        >
+          <span className="text-lg font-bold text-muted-foreground lg:text-xl">
+            {formatMoney(amount, currency)}
+          </span>
+        </DashboardCard>
+      )}
+    </>
+
+    // <DashboardCard
+    // 	leftSide={
+    // 		<span className="text-xs text-muted-foreground lg:text-sm">
+    // 			{title}
+    // 		</span>
+    // 	}
+    // 	rightSide={icon}
+    // 	bgColor={
+    // 		bg ?? "bg-linear-[150deg] from-primary/50 to-primary/10 text-white"
+    // 	}
+    // >
+    // 	<span className="text-lg font-bold text-muted-foreground lg:text-xl">
+    // 		{isLoading ? (
+    // 			<Skeleton
+    // 				className="h-6 w-28"
+    // 				label={`Loading ${title.toLowerCase()} total`}
+    // 			/>
+    // 		) : (
+    // 			formatMoney(amount, currency)
+    // 		)}
+    // 	</span>
+    // </DashboardCard>
+  );
 };
 
 export default IncomeExpenseDashboardCard;
