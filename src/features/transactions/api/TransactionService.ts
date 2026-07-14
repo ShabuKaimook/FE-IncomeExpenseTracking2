@@ -23,11 +23,9 @@ export const TransactionService = {
 	getUserTransactions: async (
 		req: GetTransactionRequest,
 	): Promise<TransactionResponse[]> => {
-		const { user_id, ...body } = req;
-
 		const response = await axiosInstance.post<TransactionResponse[]>(
-			`${TRANSACTION_PREFIX}/user/${user_id}`,
-			body,
+			`${TRANSACTION_PREFIX}/me`,
+			req,
 		);
 
 		return response.data;
@@ -36,11 +34,9 @@ export const TransactionService = {
 	getUserIncomeTotal: async (
 		req: GetUserIncomeTotalRequest,
 	): Promise<number> => {
-		const { user_id, ...body } = req;
-
 		const response = await axiosInstance.post<number>(
-			`${TRANSACTION_PREFIX}/user/${user_id}/income`,
-			body,
+			`${TRANSACTION_PREFIX}/me/income`,
+			req,
 		);
 
 		return response.data;
@@ -49,10 +45,9 @@ export const TransactionService = {
 	getUserExpenseTotal: async (
 		req: GetUserExpenseTotalRequest,
 	): Promise<number> => {
-		const { user_id, ...body } = req;
 		const response = await axiosInstance.post<number>(
-			`${TRANSACTION_PREFIX}/user/${user_id}/expense`,
-			body,
+			`${TRANSACTION_PREFIX}/me/expense`,
+			req,
 		);
 
 		return response.data;

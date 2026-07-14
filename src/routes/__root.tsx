@@ -1,4 +1,3 @@
-import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -6,13 +5,11 @@ import {
 	HeadContent,
 	Scripts,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { useState } from "react";
+import { AuthProvider } from "@/features/auth/AuthProvider";
 import { GlobalToast } from "@/shared/components/GlobalToast";
 import Navbar from "@/shared/components/Navbar";
 import { Sidebar } from "@/shared/components/Sidebar";
-import ClerkProvider from "../integrations/clerk/provider";
-import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import { queryClient } from "../integrations/tanstack-query/root-provider";
 import appCss from "../styles.css?url";
 
@@ -66,7 +63,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<GlobalToast />
-				<ClerkProvider>
+				<AuthProvider>
 					<QueryClientProvider client={queryClient}>
 						<div id="root-layout" className="p-4">
 							<header>
@@ -95,20 +92,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							</div>
 						</div>
 
-						<TanStackDevtools
-							config={{
-								position: "bottom-right",
-							}}
-							plugins={[
-								{
-									name: "Tanstack Router",
-									render: <TanStackRouterDevtoolsPanel />,
-								},
-								TanStackQueryDevtools,
-							]}
-						/>
 					</QueryClientProvider>
-				</ClerkProvider>
+				</AuthProvider>
 				<Scripts />
 			</body>
 		</html>

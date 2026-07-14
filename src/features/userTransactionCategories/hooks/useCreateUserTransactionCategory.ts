@@ -9,9 +9,9 @@ export const useCreateUserTransactionCategory = () => {
 	return useMutation({
 		mutationFn: (body: CreateUserTransactionCategoryRequest) =>
 			UserTransactionCategoryService.createUserTransactionCategory(body),
-		onSuccess: (_data, variables) => {
+		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: userTransactionCategoryKeys.list(variables.user_id),
+				queryKey: userTransactionCategoryKeys.lists(),
 			});
 		},
 	});

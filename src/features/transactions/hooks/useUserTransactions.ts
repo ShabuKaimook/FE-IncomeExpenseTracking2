@@ -7,7 +7,6 @@ export const useUserTransactions = (req: GetTransactionRequest) => {
 	const { data, error, isLoading } = useQuery({
 		queryKey: transactionKeys.list(req),
 		queryFn: () => TransactionService.getUserTransactions(req),
-		enabled: !!req.user_id,
 	});
 
 	return { transactions: data ?? [], error, isLoading };

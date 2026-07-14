@@ -13,7 +13,6 @@ export function useUserTransactionCategorySummary(
 		queryKey: userTransactionCategoryKeys.summary(req),
 		queryFn: () =>
 			UserTransactionCategoryService.getUserTransactionCategorySummary(req),
-		enabled: !!req.user_id,
 	});
 
 	return { summary: data ?? [], error, isLoading };

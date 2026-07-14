@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { useUserSavingRate } from "@/features/transactions/hooks/useUserSavingRate";
 import { DashboardCard } from "@/shared/components/DashboardCard";
 import { Skeleton } from "@/shared/components/Skeleton";
-import { MOCK_USER_ID } from "@/shared/constants/User";
 import { getLastMonthRange, getThisMonthRange } from "@/shared/utils/Month";
 
 export const SavingRateDashboardCard = () => {
@@ -16,7 +15,6 @@ export const SavingRateDashboardCard = () => {
 		isLoading: isThisLoading,
 		error: thisMonthError,
 	} = useUserSavingRate({
-		user_id: MOCK_USER_ID,
 		periods: [
 			{
 				start_date: thisMonthRange.startDate,
@@ -30,7 +28,6 @@ export const SavingRateDashboardCard = () => {
 		isLoading: isLastMonthLoading,
 		error: lastMonthError,
 	} = useUserSavingRate({
-		user_id: MOCK_USER_ID,
 		periods: [
 			{
 				start_date: lastMonthRange.startDate,

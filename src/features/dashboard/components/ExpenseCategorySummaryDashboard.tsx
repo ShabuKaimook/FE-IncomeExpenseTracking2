@@ -7,7 +7,6 @@ import { PieChart } from "@/shared/charts/PieChart";
 import { DashboardCard } from "@/shared/components/DashboardCard";
 import { ChartSkeleton } from "@/shared/components/Skeleton";
 import { TRANSACTION_TYPE } from "@/shared/constants/TransactionTypeEnum";
-import { MOCK_USER_ID } from "@/shared/constants/User";
 import { getThisMonthRange } from "@/shared/utils/Month";
 
 const ExpenseCategorySummaryDashboard = () => {
@@ -16,7 +15,6 @@ const ExpenseCategorySummaryDashboard = () => {
     error,
     isLoading,
   } = useUserTransactionCategorySummary({
-    user_id: MOCK_USER_ID,
     periods: [
       {
         start_date: getThisMonthRange().startDate,

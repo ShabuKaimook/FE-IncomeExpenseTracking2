@@ -9,9 +9,9 @@ export const useDeleteUserTransactionCategory = () => {
 	return useMutation({
 		mutationFn: (body: DeleteUserTransactionCategoryRequest) =>
 			UserTransactionCategoryService.deleteUserTransactionCategory(body),
-		onSuccess: (_data, variables) => {
+		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: userTransactionCategoryKeys.list(variables.user_id),
+				queryKey: userTransactionCategoryKeys.lists(),
 			});
 		},
 	});

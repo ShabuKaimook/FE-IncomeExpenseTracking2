@@ -7,7 +7,6 @@ export const useUserExpenseTotal = (req: GetUserExpenseTotalRequest) => {
 	const { data, error, isLoading } = useQuery({
 		queryKey: transactionKeys.expenseTotal(req),
 		queryFn: () => TransactionService.getUserExpenseTotal(req),
-		enabled: !!req.user_id,
 	});
 
 	return { error, expenseTotal: data ?? 0, isLoading };

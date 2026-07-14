@@ -1,7 +1,8 @@
 // Navbar.tsx
 import { Link } from "@tanstack/react-router";
-import { ChevronUp } from "lucide-react";
+import { ChevronUp, LogIn, LogOut } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
+import { useAuth } from "@/features/auth/AuthProvider";
 
 interface NavbarProps {
 	isMenuOpen: boolean;
@@ -10,6 +11,8 @@ interface NavbarProps {
 }
 
 const Navbar = ({ isMenuOpen, setIsMenuOpen, navbarHeight }: NavbarProps) => {
+	const { isAuthenticated, logout, user } = useAuth();
+
 	return (
 		<nav
 			className={`flex items-center justify-between pb-4 ${navbarHeight ? `h-[${navbarHeight}px]` : ""}`}
@@ -25,19 +28,43 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen, navbarHeight }: NavbarProps) => {
 				<span className="text-3xl font-bold">Home</span>
 			</div>
 
-			<button
-				type="button"
-				className="cursor-pointer"
-				onClick={() => setIsMenuOpen((prev) => !prev)}
-				aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-				aria-expanded={isMenuOpen}
-			>
-				<ChevronUp
-					className={`transition-transform duration-300 ease-in-out ${
-						isMenuOpen ? "-rotate-180" : "rotate-0"
-					}`}
-				/>
-			</button>
+			<div className="flex items-center gap-3">
+				{isAuthenticated ? (
+					<div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
+						<span>{user?.displayName}</span>
+						<button
+							type="button"
+							onClick={logout}
+							className="inline-flex size-9 items-center justify-center rounded-lg border border-(--line) bg-(--surface) text-foreground"
+							aria-label="Sign out"
+						>
+							<LogOut size={17} />
+						</button>
+					</div>
+				) : (
+					<Link
+						to="/login"
+						className="inline-flex size-9 items-center justify-center rounded-lg border border-(--line) bg-(--surface) text-foreground"
+						aria-label="Sign in"
+					>
+						<LogIn size={17} />
+					</Link>
+				)}
+
+				<button
+					type="button"
+					className="cursor-pointer"
+					onClick={() => setIsMenuOpen((prev) => !prev)}
+					aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+					aria-expanded={isMenuOpen}
+				>
+					<ChevronUp
+						className={`transition-transform duration-300 ease-in-out ${
+							isMenuOpen ? "-rotate-180" : "rotate-0"
+						}`}
+					/>
+				</button>
+			</div>
 		</nav>
 	);
 };

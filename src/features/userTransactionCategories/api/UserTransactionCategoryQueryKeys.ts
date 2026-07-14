@@ -3,8 +3,7 @@ import type { GetUserTransactionCategorySummaryRequest } from "@/features/userTr
 export const userTransactionCategoryKeys = {
 	all: ["user-transaction-categories"] as const,
 	lists: () => [...userTransactionCategoryKeys.all, "list"] as const,
-	list: (userId: string) =>
-		[...userTransactionCategoryKeys.lists(), userId] as const,
+	list: () => [...userTransactionCategoryKeys.lists(), "me"] as const,
 	summary: (req: GetUserTransactionCategorySummaryRequest) =>
 		[...userTransactionCategoryKeys.all, "summary", req] as const,
 };

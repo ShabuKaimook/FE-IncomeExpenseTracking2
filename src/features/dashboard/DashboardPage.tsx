@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import { useUserExpenseTotal } from "@/features/transactions/hooks/useUserExpenseTotal";
 import { useUserIncomeTotal } from "@/features/transactions/hooks/useUserIncomeTotal";
 import { useUserTransactions } from "@/features/transactions/hooks/useUserTransactions";
-import { MOCK_USER_ID } from "@/shared/constants/User";
 import { formatRelativeDate } from "@/shared/utils/FormatDate";
 import { getThisMonthRange } from "@/shared/utils/Month";
 import ExpenseCategorySummaryDashboard from "./components/ExpenseCategorySummaryDashboard";
@@ -25,7 +24,6 @@ export default function DashboardPage() {
 		incomeTotal,
 		isLoading: isIncomeLoading,
 	} = useUserIncomeTotal({
-		user_id: MOCK_USER_ID,
 		criteria: thisMonthCriteria,
 	});
 
@@ -34,7 +32,6 @@ export default function DashboardPage() {
 		expenseTotal,
 		isLoading: isExpenseLoading,
 	} = useUserExpenseTotal({
-		user_id: MOCK_USER_ID,
 		criteria: thisMonthCriteria,
 	});
 
@@ -43,7 +40,6 @@ export default function DashboardPage() {
 		isLoading: isTransactionsLoading,
 		transactions,
 	} = useUserTransactions({
-		user_id: MOCK_USER_ID,
 		pagination: { limit: 5, offset: 0 },
 	});
 

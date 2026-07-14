@@ -50,50 +50,27 @@ bun run check
 ```
 
 
-## Setting up Clerk
+## Setting up LINE Login
 
-1. Sign up at [clerk.com](https://clerk.com) and create an application
-2. Copy the **Publishable Key** from the Clerk dashboard
-3. Set it in your `.env.local`:
+1. Create a LINE Login channel in the LINE Developers Console
+2. Add this callback URL to the LINE Login channel:
    ```bash
-   VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
+   https://clapped-unpummelled-penni.ngrok-free.dev/auth/line/callback
    ```
-4. Visit the demo route at `/demo/clerk` once `bun run dev` is running
+3. Set frontend env values in `.env.local`:
+   ```bash
+   VITE_API_BASE_URL=http://localhost:3002/api/v1
+   VITE_LINE_LOGIN_CHANNEL_ID=2010169417
+   VITE_LINE_REDIRECT_URI=https://clapped-unpummelled-penni.ngrok-free.dev/auth/line/callback
+   ```
+4. Set backend env values:
+   ```bash
+   LINE_LOGIN_CHANNEL_ID=your_line_login_channel_id
+   LINE_LOGIN_CHANNEL_SECRET=your_line_login_channel_secret
+   APP_JWT_SECRET=replace_with_a_long_random_secret
+   ```
 
-### What's wired up
-
-- **`<ClerkProvider>`** at the app root (`src/integrations/clerk/provider.tsx`) handles auth context for the whole tree
-- **`<SignInButton>` / `<UserButton>`** in the header swap based on auth state
-- **`/demo/clerk`** shows Clerk's prebuilt sign-in UI and a signed-in greeting
-
-### Protecting a route
-
-Wrap any component in `<SignedIn>` / `<SignedOut>`:
-
-```tsx
-import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
-
-function ProtectedPage() {
-  return (
-    <>
-      <SignedIn>
-        <YourPageContent />
-      </SignedIn>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-    </>
-  )
-}
-```
-
-For server-side checks (route loaders, server functions), see the Clerk docs on [`auth()`](https://clerk.com/docs/references/backend/auth).
-
-### Production checklist
-
-- Replace the test keys with **production keys** from a dedicated production Clerk instance
-- Configure your production domain under **Domains** in the Clerk dashboard
-- Set up social providers (Google, GitHub, etc.) under **User & Authentication → Social Connections**
+The dashboard routes are protected by `src/features/auth/RequireAuth.tsx`.
 
 
 ## Shadcn

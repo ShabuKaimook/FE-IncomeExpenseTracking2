@@ -10,11 +10,11 @@ import type {
 } from "./UserTransactionCategoryResponse";
 
 export const UserTransactionCategoryService = {
-	getUserTransactionCategories: async (
-		userId: string,
-	): Promise<UserTransactionCategoryResponse[]> => {
+	getUserTransactionCategories: async (): Promise<
+		UserTransactionCategoryResponse[]
+	> => {
 		const response = await axiosInstance.get<UserTransactionCategoryResponse[]>(
-			`/user-transaction-category/${userId}`,
+			"/user-transaction-category/me",
 		);
 
 		return response.data;

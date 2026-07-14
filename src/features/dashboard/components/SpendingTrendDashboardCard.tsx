@@ -9,7 +9,6 @@ import { DashboardCard } from "@/shared/components/DashboardCard";
 import { ChartSkeleton } from "@/shared/components/Skeleton";
 import { ChartTheme } from "@/shared/constants/ChartThemeEnum";
 import { PERIOD_MODE } from "@/shared/constants/Period";
-import { MOCK_USER_ID } from "@/shared/constants/User";
 import { getThisMonthRange } from "@/shared/utils/Month";
 
 export const SpendingTrendDashboardCard = () => {
@@ -20,7 +19,6 @@ export const SpendingTrendDashboardCard = () => {
     expenseSummary,
     isLoading,
   } = useUserExpenseSummary({
-    user_id: MOCK_USER_ID,
     period_mode: PERIOD_MODE.MONTH,
     periods: [
       {

@@ -9,15 +9,12 @@ export const useCreateTransaction = () => {
 	return useMutation({
 		mutationFn: (body: CreateTransactionRequest) =>
 			TransactionService.createTransaction(body),
-		onSuccess: (_data, variables) => {
+		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: transactionKeys.list(variables.user_id),
+				queryKey: transactionKeys.lists(),
 			});
 			queryClient.invalidateQueries({
-				queryKey: transactionKeys.incomeTotal(variables.user_id),
-			});
-			queryClient.invalidateQueries({
-				queryKey: transactionKeys.expenseTotal(variables.user_id),
+				queryKey: transactionKeys.all,
 			});
 		},
 	});
