@@ -3,6 +3,8 @@ import AuthCallbackPage from "@/features/auth/AuthCallbackPage";
 import LoginPage from "@/features/auth/LoginPage";
 import { RequireAuth } from "@/features/auth/RequireAuth";
 import DashboardPage from "@/features/dashboard/DashboardPage";
+import TransactionCreatePage from "@/features/transactions/TransactionCreatePage";
+import TransactionPage from "@/features/transactions/TransactionPage";
 import { Route as rootRoute } from "./__root";
 
 const dashboardRoute = createRoute({
@@ -17,12 +19,22 @@ const dashboardRoute = createRoute({
 
 const transactionRoute = createRoute({
 	getParentRoute: () => rootRoute,
-	path: "/transactions",
+	path: "/transaction",
 	component: () => (
 		<RequireAuth>
-			<DashboardPage />
+			<TransactionPage />
 		</RequireAuth>
-	), // TODO: Replace with the actual component for the transactions page
+	),
+});
+
+const transactionCreateRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/transaction/create",
+	component: () => (
+		<RequireAuth>
+			<TransactionCreatePage />
+		</RequireAuth>
+	),
 });
 
 const loginRoute = createRoute({
@@ -46,6 +58,7 @@ const lineAuthCallbackRoute = createRoute({
 export const routeTree = rootRoute.addChildren([
 	dashboardRoute,
 	transactionRoute,
+	transactionCreateRoute,
 	loginRoute,
 	authCallbackRoute,
 	lineAuthCallbackRoute,

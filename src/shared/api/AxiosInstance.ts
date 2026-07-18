@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getAuthToken } from "@/features/auth/authStorage";
+import { getDebugAuthToken } from "@/features/auth/debugAuth";
 import { env } from "@/shared/config/Env";
 
 export const axiosInstance = axios.create({
@@ -10,7 +11,7 @@ export const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-	const token = getAuthToken();
+	const token = getDebugAuthToken() ?? getAuthToken();
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`;
 	}

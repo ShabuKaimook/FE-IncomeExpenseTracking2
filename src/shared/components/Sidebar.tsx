@@ -1,8 +1,10 @@
 // Sidebar.tsx
+import { useAuth } from "@/features/auth/AuthProvider";
 import { Link } from "@tanstack/react-router";
 import {
 	BarChart3,
 	Home,
+	LogOut,
 	type LucideIcon,
 	Receipt,
 	Settings,
@@ -13,6 +15,7 @@ interface NavItem {
 	label: string;
 	to: string;
 	icon: LucideIcon;
+	onClick?: () => void;
 }
 
 // TODO: make the path as an enum
@@ -22,6 +25,7 @@ const navItems: NavItem[] = [
 	{ label: "Category", to: "/category", icon: Tags },
 	{ label: "Analytic", to: "/analytic", icon: BarChart3 },
 	{ label: "Setting", to: "/setting", icon: Settings },
+	{ label: "Logout", to: "/logout", icon: LogOut, onClick: () => { const { logout } = useAuth(); logout(); } },
 ];
 
 interface SidebarProps {
@@ -39,10 +43,11 @@ export const Sidebar = ({ isOpen, navbarHeight }: SidebarProps) => {
 						isOpen ? "" : "-translate-y-50 opacity-0 pointer-events-none"
 					}`}
 			>
-				{navItems.map(({ label, to, icon: Icon }) => (
+				{navItems.map(({ label, to, icon: Icon, onClick }) => (
 					<Link
 						key={to}
 						to={to}
+						onClick={onClick}
 						className="group relative flex items-center gap-3 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground select-none"
 						activeProps={{
 							className: "text-foreground",

@@ -10,6 +10,7 @@ import {
 import { AuthService } from "./api/AuthService";
 import type { AuthUser } from "./api/AuthResponse";
 import { clearAuthToken, getAuthToken, setAuthToken } from "./authStorage";
+import { debugAuthChangedEvent, getDebugAuthToken } from "./debugAuth";
 
 type AuthContextValue = {
 	user: AuthUser | null;
@@ -25,21 +26,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<AuthUser | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 
-	useEffect(() => {
-		const token = getAuthToken();
+	const refreshSession = useCallback(() => {
+		const token = getDebugAuthToken() ?? getAuthToken();
 		if (!token) {
+			setUser(null);
 			setIsLoading(false);
 			return;
 		}
 
+		setIsLoading(true);
 		AuthService.me()
 			.then((response) => setUser(response.user))
 			.catch(() => {
-				clearAuthToken();
+				if (!getDebugAuthToken()) {
+					clearAuthToken();
+				}
 				setUser(null);
 			})
 			.finally(() => setIsLoading(false));
 	}, []);
+
+	useEffect(() => {
+		refreshSession();
+	}, [refreshSession]);
+
+	useEffect(() => {
+		window.addEventListener(debugAuthChangedEvent, refreshSession);
+
+		return () => {
+			window.removeEventListener(debugAuthChangedEvent, refreshSession);
+		};
+	}, [refreshSession]);
 
 	const completeLogin = useCallback((accessToken: string, nextUser: AuthUser) => {
 		setAuthToken(accessToken);

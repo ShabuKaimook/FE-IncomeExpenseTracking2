@@ -62,6 +62,7 @@ bun run check
    VITE_API_BASE_URL=http://localhost:3002/api/v1
    VITE_LINE_LOGIN_CHANNEL_ID=2010169417
    VITE_LINE_REDIRECT_URI=https://clapped-unpummelled-penni.ngrok-free.dev/auth/line/callback
+   VITE_FAKE_AUTH_TOKEN=fake-dev-access-token
    ```
 4. Set backend env values:
    ```bash
@@ -71,6 +72,14 @@ bun run check
    ```
 
 The dashboard routes are protected by `src/features/auth/RequireAuth.tsx`.
+
+For local fake bearer auth, run this in the browser console:
+
+```js
+window.enableDebug(true)
+```
+
+Run `window.enableDebug(false)` to return to normal JWT auth.
 
 
 ## Shadcn

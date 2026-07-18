@@ -8,8 +8,11 @@ const required = (name: string): string => {
 	return value;
 };
 
+const optional = (name: string): string | undefined => import.meta.env[name];
+
 export const env = {
 	API_BASE_URL: required("VITE_API_BASE_URL"),
 	LINE_LOGIN_CHANNEL_ID: required("VITE_LINE_LOGIN_CHANNEL_ID"),
 	LINE_REDIRECT_URI: required("VITE_LINE_REDIRECT_URI"),
+	FAKE_AUTH_TOKEN: optional("VITE_FAKE_AUTH_TOKEN"),
 } as const;
