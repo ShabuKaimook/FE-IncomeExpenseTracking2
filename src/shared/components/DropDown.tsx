@@ -45,6 +45,7 @@ export interface DropDownProps {
 	contentClassName?: string;
 	sectionClassName?: string;
 	itemClassName?: string;
+	triggerAriaLabel?: string;
 	align?: "start" | "center" | "end";
 	side?: "top" | "right" | "bottom" | "left";
 	disabled?: boolean;
@@ -52,13 +53,13 @@ export interface DropDownProps {
 }
 
 const defaultTriggerClassName =
-	"inline-flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-lg border border-(--line) bg-(--surface) px-3 text-left text-sm outline-none transition hover:bg-(--surface-strong) focus-visible:ring-2 focus-visible:ring-primary/40 disabled:pointer-events-none disabled:opacity-50";
+	"group inline-flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-lg border border-(--line) bg-(--surface) px-3 text-left text-sm outline-none transition hover:bg-(--surface-strong) focus-visible:ring-2 focus-visible:ring-primary/40 disabled:pointer-events-none disabled:opacity-50";
 
 const defaultContentClassName =
-	"z-50 min-w-48 overflow-hidden rounded-lg border border-(--line) bg-popover p-1.5 text-popover-foreground shadow-xl";
+	"z-50 min-w-48 origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-hidden rounded-lg border border-(--line) bg-popover p-1.5 text-popover-foreground shadow-xl transition duration-150 ease-out data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:scale-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:scale-in-95";
 
 const defaultItemClassName =
-	"relative flex w-full cursor-pointer select-none items-center gap-2 rounded-md px-2.5 py-2 text-sm outline-none transition hover:bg-primary/10 focus:bg-primary/10 data-[disabled]:pointer-events-none data-[disabled]:opacity-45";
+	"relative flex w-full cursor-pointer select-none items-center gap-2 rounded-md px-2.5 py-2 text-sm outline-none transition hover:bg-primary/10 focus:bg-primary/10 data-[selected=true]:bg-primary/20 data-[state=checked]:bg-primary/20 data-[disabled]:pointer-events-none data-[disabled]:opacity-45";
 
 const controlClassName = "size-4 shrink-0 text-primary";
 
@@ -180,6 +181,7 @@ export function DropDown({
 	contentClassName,
 	sectionClassName,
 	itemClassName,
+	triggerAriaLabel,
 	align = "end",
 	side = "bottom",
 	disabled = false,
@@ -217,6 +219,7 @@ export function DropDown({
 			<DropdownMenu.Trigger asChild disabled={disabled}>
 				<button
 					type="button"
+					aria-label={triggerAriaLabel}
 					className={cn(defaultTriggerClassName, triggerClassName)}
 				>
 					{renderTriggerContent({
@@ -266,6 +269,7 @@ export function DropDown({
 												<DropdownMenu.RadioItem
 													key={`${item.value}-${item.title}-${itemIndex}`}
 													value={item.value}
+													data-selected={isSelected}
 													disabled={item.disabled}
 													onSelect={() => handleItemSelect(section, item)}
 													className={cn(defaultItemClassName, itemClassName)}
@@ -288,6 +292,7 @@ export function DropDown({
 												<DropdownMenu.CheckboxItem
 													key={`${item.value}-${item.title}-${itemIndex}`}
 													checked={isSelected}
+													data-selected={isSelected}
 													disabled={item.disabled}
 													onSelect={(event) => {
 														if (!closeCheckboxOnSelect) {
@@ -309,6 +314,7 @@ export function DropDown({
 										return (
 											<DropdownMenu.Item
 												key={`${item.value}-${item.title}-${itemIndex}`}
+												data-selected={isSelected}
 												disabled={item.disabled}
 												onSelect={() => handleItemSelect(section, item)}
 												className={cn(defaultItemClassName, itemClassName)}

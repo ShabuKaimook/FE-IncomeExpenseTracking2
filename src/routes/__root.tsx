@@ -5,12 +5,10 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useState } from "react";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { GlobalToast } from "@/shared/components/GlobalToast";
 import Navbar from "@/shared/components/Navbar";
 import { NotFoundPage } from "@/shared/components/NotFoundPage";
-import { Sidebar } from "@/shared/components/Sidebar";
 import { queryClient } from "../integrations/tanstack-query/root-provider";
 import appCss from "../styles.css?url";
 import { Theme } from "@radix-ui/themes";
@@ -58,8 +56,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 const NAVBAR_HEIGHT = 72;
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   return (
     <html lang="en">
       <head>
@@ -73,12 +69,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               <div id="root-layout" className="p-4">
                 <header>
                   <div className="frame relative mb-4">
-                    <Navbar
-                      isMenuOpen={isMenuOpen}
-                      setIsMenuOpen={setIsMenuOpen}
-                      navbarHeight={NAVBAR_HEIGHT}
-                    />
-                    <Sidebar isOpen={isMenuOpen} navbarHeight={NAVBAR_HEIGHT} />
+                    <Navbar navbarHeight={NAVBAR_HEIGHT} />
                   </div>
                 </header>
 

@@ -1,17 +1,15 @@
 // Navbar.tsx
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronUp, LogIn } from "lucide-react";
-import type { Dispatch, SetStateAction } from "react";
+import { LogIn } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { Sidebar } from "@/shared/components/Sidebar";
 import LogoNoImage from "/logo-no-text.png?url";
 
 interface NavbarProps {
-	isMenuOpen: boolean;
-	setIsMenuOpen: Dispatch<SetStateAction<boolean>>;
 	navbarHeight?: number;
 }
 
-const Navbar = ({ isMenuOpen, setIsMenuOpen, navbarHeight }: NavbarProps) => {
+const Navbar = ({ navbarHeight }: NavbarProps) => {
 	const { isAuthenticated, user } = useAuth();
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
@@ -48,19 +46,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen, navbarHeight }: NavbarProps) => {
 					</Link>
 				)}
 
-				<button
-					type="button"
-					className="cursor-pointer"
-					onClick={() => setIsMenuOpen((prev) => !prev)}
-					aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-					aria-expanded={isMenuOpen}
-				>
-					<ChevronUp
-						className={`transition-transform duration-300 ease-in-out ${
-							isMenuOpen ? "-rotate-180" : "rotate-0"
-						}`}
-					/>
-				</button>
+				<Sidebar />
 			</div>
 		</nav>
 	);
