@@ -1,7 +1,6 @@
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { type CSSProperties, useEffect, useState } from "react";
 import {
-  DayFlag,
   DayPicker,
   type DateRange as DayPickerDateRange,
   SelectionState,
@@ -75,6 +74,7 @@ const segmentedControlRootClassName = [
   "hover:![background-image:none]",
   "hover:!border-primary/40",
   "[&_.rt-SegmentedControlItemLabel]:!bg-transparent",
+  "[&_.rt-SegmentedControlItemLabel]:!px-2",
   "[&_.rt-SegmentedControlItemLabel:hover]:!bg-transparent",
   "[&_.rt-SegmentedControlItem[data-state=off]:hover_.rt-SegmentedControlItemLabel]:!bg-transparent",
   "[&_.rt-SegmentedControlIndicator::before]:!rounded-lg",
@@ -236,87 +236,90 @@ export const DateRangeWithShowDisabledNavigation = ({
 
       <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenu.Trigger>
-          <div
-            className={`flex h-10 w-45 cursor-pointer items-center gap-3 rounded-lg border-2 border-(--line) bg-popover px-3 text-sm focus:outline-primary transition hover:border-primary/40 ${className}`}
+          <button
+            type="button"
+            className={`flex h-10 w-full sm:w-45 cursor-pointer items-center gap-3 rounded-lg border-2 border-(--line) bg-popover px-3 text-sm focus:outline-primary transition hover:border-primary/40 ${className}`}
           >
             <CalendarDays size={17} className="shrink-0 text-primary" />
             <span className="truncate font-medium text-foreground">
               {triggerLabel}
             </span>
-          </div>
+          </button>
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Content
           align="start"
           className="z-9999! border-none! bg-transparent! p-0! shadow-none!"
         >
-          {datePickerMode === "month" ? (
-            <div className={calendarSurfaceClassName}>
-              <div className="flex h-10 items-center justify-between bg-primary px-3">
-                <button
-                  type="button"
-                  className={headerButtonClassName}
-                  onClick={goToPreviousYear}
-                  aria-label="Previous year"
-                >
-                  <ChevronLeft size={16} strokeWidth={2.5} />
-                </button>
-                <span className="text-sm font-semibold text-primary-foreground">
-                  {visibleYear}
-                </span>
-                <button
-                  type="button"
-                  className={headerButtonClassName}
-                  onClick={goToNextYear}
-                  aria-label="Next year"
-                >
-                  <ChevronRight size={16} strokeWidth={2.5} />
-                </button>
-              </div>
-              <div className="grid w-45 grid-cols-3 gap-2 p-2">
-                {monthNames.map((monthName, month) => {
-                  const isSelected =
-                    value?.getFullYear() === visibleYear &&
-                    value.getMonth() === month;
+          <div>
+            {datePickerMode === "month" ? (
+              <div className={calendarSurfaceClassName}>
+                <div className="flex h-10 items-center justify-between bg-primary px-3">
+                  <button
+                    type="button"
+                    className={headerButtonClassName}
+                    onClick={goToPreviousYear}
+                    aria-label="Previous year"
+                  >
+                    <ChevronLeft size={16} strokeWidth={2.5} />
+                  </button>
+                  <span className="text-sm font-semibold text-primary-foreground">
+                    {visibleYear}
+                  </span>
+                  <button
+                    type="button"
+                    className={headerButtonClassName}
+                    onClick={goToNextYear}
+                    aria-label="Next year"
+                  >
+                    <ChevronRight size={16} strokeWidth={2.5} />
+                  </button>
+                </div>
+                <div className="grid w-45 grid-cols-3 gap-2 p-2">
+                  {monthNames.map((monthName, month) => {
+                    const isSelected =
+                      value?.getFullYear() === visibleYear &&
+                      value.getMonth() === month;
 
-                  return (
-                    <button
-                      key={monthName}
-                      type="button"
-                      className={`h-7 whitespace-nowrap rounded-lg text-sm transition ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground"
-                          : "text-(--sea-ink-soft) hover:bg-primary/30 hover:text-(--sea-ink)"
-                      }`}
-                      onClick={() => handleMonthButtonClick(month)}
-                    >
-                      {monthName}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={monthName}
+                        type="button"
+                        className={`h-7 whitespace-nowrap rounded-lg text-sm transition ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground"
+                            : "text-(--sea-ink-soft) hover:bg-primary/30 hover:text-(--sea-ink)"
+                        }`}
+                        onClick={() => handleMonthButtonClick(month)}
+                      >
+                        {monthName}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="rounded-lg border-2 border-(--line) bg-popover text-(--sea-ink-soft)">
-              <DayPicker
-                animate
-                captionLayout="label"
-                navLayout="around"
-                mode="range"
-                selected={{
-                  from: startDate ?? undefined,
-                  to: endDate ?? undefined,
-                }}
-                onSelect={handleCustomRangeChange}
-                month={visibleMonth}
-                onMonthChange={setVisibleMonth}
-                showOutsideDays
-                resetOnSelect
-                classNames={dayPickerClassNames}
-                styles={dayPickerStyles}
-              />
-            </div>
-          )}
+            ) : (
+              <div className="rounded-lg border-2 border-(--line) bg-popover text-(--sea-ink-soft)">
+                <DayPicker
+                  animate
+                  captionLayout="label"
+                  navLayout="around"
+                  mode="range"
+                  selected={{
+                    from: startDate ?? undefined,
+                    to: endDate ?? undefined,
+                  }}
+                  onSelect={handleCustomRangeChange}
+                  month={visibleMonth}
+                  onMonthChange={setVisibleMonth}
+                  showOutsideDays
+                  resetOnSelect
+                  classNames={dayPickerClassNames}
+                  styles={dayPickerStyles}
+                />
+              </div>
+            )}
+          </div>
         </DropdownMenu.Content>
       </DropdownMenu.Root>
     </div>

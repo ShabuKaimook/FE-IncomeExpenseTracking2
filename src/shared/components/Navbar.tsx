@@ -3,7 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronUp, LogIn } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { useAuth } from "@/features/auth/AuthProvider";
-import LogoNoImage from "/public/logo-no-text.png";
+import LogoNoImage from "/logo-no-text.png?url";
 
 interface NavbarProps {
 	isMenuOpen: boolean;

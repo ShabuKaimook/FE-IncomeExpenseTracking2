@@ -5,7 +5,15 @@ import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const config = defineConfig({
-	resolve: { tsconfigPaths: true },
+	resolve: {
+		tsconfigPaths: true,
+		dedupe: [
+			"@tanstack/react-router",
+			"@tanstack/router-core",
+			"@tanstack/start-client-core",
+			"@tanstack/start-server-core",
+		],
+	},
 	plugins: [
 		tailwindcss(),
 		tanstackStart(),

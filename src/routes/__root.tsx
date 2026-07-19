@@ -9,6 +9,7 @@ import { useState } from "react";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { GlobalToast } from "@/shared/components/GlobalToast";
 import Navbar from "@/shared/components/Navbar";
+import { NotFoundPage } from "@/shared/components/NotFoundPage";
 import { Sidebar } from "@/shared/components/Sidebar";
 import { queryClient } from "../integrations/tanstack-query/root-provider";
 import appCss from "../styles.css?url";
@@ -50,6 +51,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
+  notFoundComponent: NotFoundPage,
   shellComponent: RootDocument,
 });
 

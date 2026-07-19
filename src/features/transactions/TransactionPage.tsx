@@ -1,10 +1,8 @@
-import { Link } from "@tanstack/react-router";
-import { Camera, ListFilter, Plus, ReceiptText, Search } from "lucide-react";
+import { ListFilter, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useUserTransactions } from "@/features/transactions/hooks/useUserTransactions";
 import { TransactionCard } from "@/features/transactions/components/TransactionCard";
 import type { Transaction } from "@/features/transactions/components/TransactionCard";
-import { CustomDropdown } from "@/features/transactions/components/CustomDropdown";
 import { TransactionListSkeleton } from "@/shared/components/Skeleton";
 import { TRANSACTION_TYPE } from "@/shared/constants/TransactionTypeEnum";
 import {
@@ -12,10 +10,14 @@ import {
   type DatePickerRange,
 } from "@/shared/components/DatePicker";
 import { getThisMonthDateRange } from "@/shared/utils/Month";
-import { DropdownMenu } from "radix-ui";
-import { Button } from "@radix-ui/themes";
+import NewTransactionButton from "./components/NewTransactionButton";
+import TransactionSortByDropdown from "./components/TransactionSortByDropdown";
+import TransactionGroupByDropdown from "./components/TransactionGroupByDropdown";
+import type {
+  TransactionGroupBy,
+  TransactionGroupDirection,
+} from "./components/TransactionGroupByDropdown";
 
-type GroupBy = "date" | "category" | "type";
 type SortBy = "description" | "amount" | "date";
 type SortOrder = "asc" | "desc";
 
@@ -65,7 +67,10 @@ const mapTransaction = (transaction: {
   type_name: transaction.transaction_type_name,
 });
 
-const getGroupLabel = (transaction: Transaction, groupBy: GroupBy) => {
+const getGroupLabel = (
+  transaction: Transaction,
+  groupBy: TransactionGroupBy,
+) => {
   if (groupBy === "category") {
     return transaction.category;
   }
@@ -99,6 +104,26 @@ const compareTransactions = (sortBy: SortBy, sortOrder: SortOrder) => {
   };
 };
 
+const compareGroupLabels = (
+  groupBy: TransactionGroupBy,
+  direction: TransactionGroupDirection,
+) => {
+  const multiplier = direction === "asc" ? 1 : -1;
+
+  return (
+    [labelA]: [string, Transaction[]],
+    [labelB]: [string, Transaction[]],
+  ) => {
+    if (groupBy === "date") {
+      return (
+        (new Date(labelA).getTime() - new Date(labelB).getTime()) * multiplier
+      );
+    }
+
+    return labelA.localeCompare(labelB) * multiplier;
+  };
+};
+
 export default function TransactionPage() {
   const initialRange = getThisMonthDateRange(new Date());
   const [selectedMonth, setSelectedMonth] = useState(toMonthValue(new Date()));
@@ -108,10 +133,11 @@ export default function TransactionPage() {
     endDate: initialRange.endDate,
   });
   const [search, setSearch] = useState("");
-  const [groupBy, setGroupBy] = useState<GroupBy>("date");
+  const [groupBy, setGroupBy] = useState<TransactionGroupBy>("date");
+  const [groupDirection, setGroupDirection] =
+    useState<TransactionGroupDirection>("desc");
   const [sortBy, setSortBy] = useState<SortBy>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
-  const [isAddOpen, setIsAddOpen] = useState(false);
   const { transactions, isLoading, error } = useUserTransactions({
     pagination: { limit: 100, offset: 0 },
   });
@@ -144,9 +170,16 @@ export default function TransactionPage() {
     }, {});
   }, [dateRange, groupBy, search, sortBy, sortOrder, transactions]);
 
+  const sortedGroups = useMemo(
+    () =>
+      Object.entries(groups).sort(compareGroupLabels(groupBy, groupDirection)),
+    [groupBy, groupDirection, groups],
+  );
+
   return (
     <div className="flex flex-col gap-4 relative">
-      <section className="relative z-30 rounded-xl">
+      <section className="z-30 rounded-xl">
+        {/* First Section -> Date picker + New transaction */}
         <div className="flex flex-col gap-3 sm:flex-row lg:items-center lg:justify-between">
           <DateRangeWithShowDisabledNavigation
             value={fromMonthValue(selectedMonth)}
@@ -159,45 +192,11 @@ export default function TransactionPage() {
             className="lg:w-72"
           />
 
-          {/* <div className="relative">
-						<button
-							type="button"
-							onClick={() => setIsAddOpen((current) => !current)}
-							className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90 lg:w-auto"
-							aria-expanded={isAddOpen}
-						>
-							<Plus size={18} />
-							<p >New transaction</p>
-						</button>
-
-						{isAddOpen && (
-							<div className="absolute right-0 z-20 mt-2 grid w-full min-w-56 gap-2 rounded-lg border border-(--line) bg-(--surface-strong) p-2 shadow-xl backdrop-blur lg:w-56">
-								<Link
-									to="/transaction/create"
-									className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground transition hover:bg-primary/10"
-								>
-									<ReceiptText size={16} />
-									Manual add
-								</Link>
-								<a
-									href="/transaction/create?mode=image"
-									className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-foreground transition hover:bg-primary/10"
-								>
-									<Camera size={16} />
-									Add by image
-								</a>
-							</div>
-						)}
-					</div> */}
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger className="flex h-11 w-11 sm:w-60 items-center justify-center gap-2 rounded-full  sm:rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition cursor-pointer hover:opacity-90 ">
-              <Plus size={17} />
-              <p className="absolute hidden sm:inline sm:relative">New Transaction</p>
-            </DropdownMenu.Trigger>
-          </DropdownMenu.Root>
+          <NewTransactionButton />
         </div>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(190px,0.7fr)_minmax(220px,0.9fr)]">
+        {/* Second Section -> Search, Group by, Sort By (TODO: add filter) */}
+        <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1.4fr)_minmax(190px,0.7fr)_minmax(220px,0.9fr)]">
           <label className="flex h-11 min-w-0 items-center gap-3 rounded-lg border border-(--line) bg-(--surface-strong) px-3 text-sm shadow-sm">
             <Search size={17} className="text-muted-foreground" />
             <span className="sr-only">Search description</span>
@@ -210,47 +209,23 @@ export default function TransactionPage() {
             />
           </label>
 
-          <CustomDropdown
-            label="Group by"
-            value={groupBy}
-            onChange={(value) => setGroupBy(value as GroupBy)}
-            sections={[
-              {
-                options: [
-                  { label: "Date", value: "date" },
-                  { label: "Transaction category", value: "category" },
-                  { label: "Transaction type", value: "type" },
-                ],
-              },
-            ]}
-          />
+          <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row md:col-span-2">
+            <TransactionGroupByDropdown
+              value={groupBy}
+              direction={groupDirection}
+              onChange={setGroupBy}
+              onDirectionChange={setGroupDirection}
+              className="flex-1"
+            />
 
-          <CustomDropdown
-            label="Sort"
-            value={`${sortBy}:${sortOrder}`}
-            onChange={(value) => {
-              const [nextSortBy, nextSortOrder] = value.split(":");
-              setSortBy(nextSortBy as SortBy);
-              setSortOrder(nextSortOrder as SortOrder);
-            }}
-            sections={[
-              {
-                title: "Sort by",
-                options: [
-                  { label: "Description", value: "description:desc" },
-                  { label: "Amount", value: "amount:desc" },
-                  { label: "Date", value: "date:desc" },
-                ],
-              },
-              {
-                title: "Direction",
-                options: [
-                  { label: "Ascending", value: `${sortBy}:asc` },
-                  { label: "Descending", value: `${sortBy}:desc` },
-                ],
-              },
-            ]}
-          />
+            <TransactionSortByDropdown
+              value={sortBy}
+              direction={sortOrder}
+              onChange={setSortBy}
+              onDirectionChange={setSortOrder}
+              className="flex-1"
+            />
+          </div>
         </div>
       </section>
 
@@ -277,13 +252,13 @@ export default function TransactionPage() {
           <div className="flex min-h-32 items-center justify-center rounded-lg border border-destructive/20 bg-destructive/5 text-sm text-destructive">
             Unable to load transactions.
           </div>
-        ) : Object.keys(groups).length === 0 ? (
+        ) : sortedGroups.length === 0 ? (
           <div className="flex min-h-32 items-center justify-center rounded-lg border border-(--line) bg-(--surface-strong) text-sm text-muted-foreground">
             No transactions match these filters.
           </div>
         ) : (
           <div className="space-y-5">
-            {Object.entries(groups).map(([label, rows]) => (
+            {sortedGroups.map(([label, rows]) => (
               <div key={label} className="space-y-2">
                 <div className="flex items-center justify-between border-b border-(--line) pb-2">
                   <h2 className="text-sm font-semibold text-foreground">
