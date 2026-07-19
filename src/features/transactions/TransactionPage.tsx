@@ -1,9 +1,10 @@
-import { ListFilter, Search } from "lucide-react";
+import { ListFilter } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useUserTransactions } from "@/features/transactions/hooks/useUserTransactions";
 import { TransactionCard } from "@/features/transactions/components/TransactionCard";
 import type { Transaction } from "@/features/transactions/components/TransactionCard";
 import { TransactionListSkeleton } from "@/shared/components/Skeleton";
+import { SearchBar } from "@/shared/components/SearchBar";
 import { TRANSACTION_TYPE } from "@/shared/constants/TransactionTypeEnum";
 import {
   DateRangeWithShowDisabledNavigation,
@@ -197,19 +198,14 @@ export default function TransactionPage() {
 
         {/* Second Section -> Search, Group by, Sort By (TODO: add filter) */}
         <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1.4fr)_minmax(190px,0.7fr)_minmax(220px,0.9fr)]">
-          <label className="flex h-11 min-w-0 items-center gap-3 rounded-lg border border-(--line) bg-(--surface-strong) px-3 text-sm shadow-sm">
-            <Search size={17} className="text-muted-foreground" />
-            <span className="sr-only">Search description</span>
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search description"
-              className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
-            />
-          </label>
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="Search description"
+            label="Search description"
+          />
 
-          <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row md:col-span-2">
+          <div className="flex w-full min-w-0 gap-3 md:col-span-2">
             <TransactionGroupByDropdown
               value={groupBy}
               direction={groupDirection}

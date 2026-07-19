@@ -33,7 +33,7 @@ const headerButtonClassName =
   "inline-flex size-7 items-center justify-center rounded-lg text-primary-foreground transition hover:bg-primary-foreground/15 disabled:cursor-not-allowed disabled:opacity-40";
 
 const calendarSurfaceClassName =
-  "overflow-hidden rounded-lg border-2 border-(--line) bg-popover shadow-sm";
+  "overflow-hidden rounded-lg border border-(--line) bg-popover shadow-sm";
 
 const dayPickerClassNames = {
   [UI.Weekday]: "h-5 text-xs font-medium text-muted-foreground",
@@ -63,7 +63,7 @@ const dayPickerStyles = {
 
 const segmentedControlRootClassName = [
   "!rounded-lg",
-  "border-2",
+  "border",
   "border-(--line)",
   "!h-10",
   "!bg-popover",
@@ -238,7 +238,7 @@ export const DateRangeWithShowDisabledNavigation = ({
         <DropdownMenu.Trigger>
           <button
             type="button"
-            className={`flex h-10 w-full sm:w-45 cursor-pointer items-center gap-3 rounded-lg border-2 border-(--line) bg-popover px-3 text-sm focus:outline-primary transition hover:border-primary/40 ${className}`}
+            className={`flex h-10 w-full sm:w-45 cursor-pointer items-center gap-3 rounded-lg border border-(--line) bg-popover px-3 text-sm focus:outline-primary transition hover:border-primary/40 ${className}`}
           >
             <CalendarDays size={17} className="shrink-0 text-primary" />
             <span className="truncate font-medium text-foreground">
@@ -299,7 +299,7 @@ export const DateRangeWithShowDisabledNavigation = ({
                 </div>
               </div>
             ) : (
-              <div className="rounded-lg border-2 border-(--line) bg-popover text-(--sea-ink-soft)">
+              <div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
                 <DayPicker
                   animate
                   captionLayout="label"

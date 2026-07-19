@@ -36,7 +36,7 @@ const TransactionSortByDropdown = ({
 
   return (
     <DropDown
-      triggerClassName={`min-h-11 bg-popover px-3 text-sm text-foreground focus:outline-primary border-2 border-(--line) rounded-lg hover:border-primary/40 transition w-full ${className ?? ""}`}
+      triggerClassName={`h-11 min-h-11 bg-popover px-3 py-1 text-sm text-foreground focus:outline-primary border border-(--line) rounded-lg hover:border-primary/40 hover:bg-primary/5 transition w-full ${className ?? ""}`}
       triggerLabel="Sort by"
       placeholder="Select sort"
       selectedValues={[value, direction]}
@@ -68,12 +68,16 @@ const TransactionSortByDropdown = ({
         }
       }}
     >
-      <span className="flex min-w-0 flex-1 items-center gap-2 text-sm">
-        <span className="shrink-0 font-medium text-foreground">Sort by:</span>
-        <DirectionIcon size={15} className="shrink-0 text-primary" />
-        <span className="truncate font-medium text-foreground">
-          {selectedSortTitle}
+      <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
+        <span className="text-[10px] font-bold uppercase leading-none text-foreground">
+          Sort by
         </span>
+        <div className="flex min-w-0 items-center gap-2 leading-tight">
+          <span className="truncate text-xs text-foreground">
+            {selectedSortTitle}
+          </span>
+          <DirectionIcon size={14} className="shrink-0 text-primary" />
+        </div>
       </span>
       <ChevronDown size={17} className="shrink-0 text-muted-foreground" />
     </DropDown>
