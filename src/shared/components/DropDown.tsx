@@ -1,6 +1,4 @@
-import { DropdownMenu } from "radix-ui";
-import { useState } from "react";
-import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
 	ChevronDown,
 	Circle,
@@ -8,7 +6,9 @@ import {
 	Square,
 	SquareCheck,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { DropdownMenu } from "radix-ui";
+import type { ReactNode } from "react";
+import { useState } from "react";
 import { cn } from "@/shared/utils/Utils";
 
 export type DropDownSectionType = "radio" | "static" | "checkbox";
@@ -25,6 +25,7 @@ export type DropDownSection = {
 	sectionType: DropDownSectionType;
 	className?: string;
 	items: DropDownItem[];
+	content?: ReactNode;
 };
 
 export type DropDownSelectEvent = {
@@ -78,7 +79,9 @@ const getNextSelectedValues = (
 			: [...selectedValues, item.value];
 	}
 
-	const sectionValueSet = new Set(section.items.map((sectionItem) => sectionItem.value));
+	const sectionValueSet = new Set(
+		section.items.map((sectionItem) => sectionItem.value),
+	);
 	return [
 		...selectedValues.filter((value) => !sectionValueSet.has(value)),
 		item.value,
@@ -262,12 +265,12 @@ export function DropDown({
 
 								{section.sectionType === "radio" ? (
 									<DropdownMenu.RadioGroup value={radioValue}>
-										{section.items.map((item, itemIndex) => {
+										{section.items.map((item) => {
 											const isSelected = selectedValueSet.has(item.value);
 
 											return (
 												<DropdownMenu.RadioItem
-													key={`${item.value}-${item.title}-${itemIndex}`}
+													key={item.value}
 													value={item.value}
 													data-selected={isSelected}
 													disabled={item.disabled}
@@ -284,13 +287,13 @@ export function DropDown({
 										})}
 									</DropdownMenu.RadioGroup>
 								) : (
-									section.items.map((item, itemIndex) => {
+									section.items.map((item) => {
 										const isSelected = selectedValueSet.has(item.value);
 
 										if (section.sectionType === "checkbox") {
 											return (
 												<DropdownMenu.CheckboxItem
-													key={`${item.value}-${item.title}-${itemIndex}`}
+													key={item.value}
 													checked={isSelected}
 													data-selected={isSelected}
 													disabled={item.disabled}
@@ -313,7 +316,7 @@ export function DropDown({
 
 										return (
 											<DropdownMenu.Item
-												key={`${item.value}-${item.title}-${itemIndex}`}
+												key={item.value}
 												data-selected={isSelected}
 												disabled={item.disabled}
 												onSelect={() => handleItemSelect(section, item)}
@@ -328,6 +331,7 @@ export function DropDown({
 										);
 									})
 								)}
+								{section.content}
 							</div>
 						);
 					})}

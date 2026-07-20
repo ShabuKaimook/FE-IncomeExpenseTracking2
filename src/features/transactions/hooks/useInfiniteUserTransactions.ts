@@ -16,9 +16,9 @@ export const useInfiniteUserTransactions = (
 	enabled = true,
 ) => {
 	const limit = req.pagination?.limit ?? DEFAULT_LIMIT;
-	const queryReq = {
+	const queryReq: GetTransactionRequest = {
 		...req,
-		pagination: { limit },
+		pagination: { limit, page: 0 },
 	};
 
 	const {

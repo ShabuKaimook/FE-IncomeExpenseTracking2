@@ -11,6 +11,8 @@ import {
 	toMonthValue,
 } from "@/shared/utils/date";
 import NewTransactionButton from "./components/NewTransactionButton";
+import type { TransactionFilterValue } from "./components/TransactionFilterDropdown";
+import TransactionFilterDropdown from "./components/TransactionFilterDropdown";
 import type {
 	TransactionGroupBy,
 	TransactionGroupDirection,
@@ -19,6 +21,24 @@ import TransactionGroupByDropdown from "./components/TransactionGroupByDropdown"
 import { TransactionHistory } from "./components/TransactionHistory";
 import type { TransactionSortBy } from "./components/TransactionSortByDropdown";
 import TransactionSortByDropdown from "./components/TransactionSortByDropdown";
+
+const getAmountRangeCriteria = (filters: TransactionFilterValue) => {
+	if (!filters.amountRangeStart || !filters.amountRangeEnd) {
+		return undefined;
+	}
+
+	const rangeStart = Number(filters.amountRangeStart);
+	const rangeEnd = Number(filters.amountRangeEnd);
+
+	if (Number.isNaN(rangeStart) || Number.isNaN(rangeEnd)) {
+		return undefined;
+	}
+
+	return {
+		range_start: Math.min(rangeStart, rangeEnd),
+		range_end: Math.max(rangeStart, rangeEnd),
+	};
+};
 
 export default function TransactionPage() {
 	const initialRange = getThisMonthDateRange(new Date());
@@ -35,16 +55,25 @@ export default function TransactionPage() {
 		useState<TransactionGroupDirection>("desc");
 	const [sortBy, setSortBy] = useState<TransactionSortBy>("date");
 	const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-	const baseCriteria = useMemo(
-		() => ({
+	const [filters, setFilters] = useState<TransactionFilterValue>({});
+	const baseCriteria = useMemo(() => {
+		const amountRange = getAmountRangeCriteria(filters);
+
+		return {
 			...(search.trim() ? { description: search.trim() } : {}),
+			...(filters.transactionTypeId
+				? { transaction_type_id: filters.transactionTypeId }
+				: {}),
+			...(filters.userTransactionCategoryIds?.length
+				? { user_transaction_category_ids: filters.userTransactionCategoryIds }
+				: {}),
+			...(amountRange ? { amount_range: amountRange } : {}),
 			...(dateRange.startDate
 				? { start_date: toDateOnly(dateRange.startDate) }
 				: {}),
 			...(dateRange.endDate ? { end_date: toDateOnly(dateRange.endDate) } : {}),
-		}),
-		[dateRange.endDate, dateRange.startDate, search],
-	);
+		};
+	}, [dateRange.endDate, dateRange.startDate, filters, search]);
 
 	return (
 		<div className="flex flex-col gap-4 relative">
@@ -71,6 +100,13 @@ export default function TransactionPage() {
 						onSubmit={() => setSearch(searchInput)}
 						placeholder="Search description"
 						label="Search description"
+						filterSlot={
+							<TransactionFilterDropdown
+								value={filters}
+								onChange={setFilters}
+								className="rounded-l-none"
+							/>
+						}
 					/>
 
 					<div className="flex w-full min-w-0 gap-3 md:col-span-2">

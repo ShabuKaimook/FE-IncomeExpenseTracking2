@@ -19,9 +19,9 @@ export const useTransactionGroupBy = (
 	enabled = true,
 ) => {
 	const limit = req.pagination?.limit ?? DEFAULT_LIMIT;
-	const queryReq = {
+	const queryReq: GetTransactionGroupByRequest = {
 		...req,
-		pagination: { limit },
+		pagination: { limit, page: 0 },
 	};
 
 	const {

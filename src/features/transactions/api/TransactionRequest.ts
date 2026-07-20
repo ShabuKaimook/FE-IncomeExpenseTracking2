@@ -14,6 +14,7 @@ export interface GetTransactionRequest {
 		description?: string;
 		transaction_type_id?: number;
 		user_transaction_category_id?: string;
+		user_transaction_category_ids?: string[];
 		amount_range?: {
 			range_start: number;
 			range_end: number;
@@ -47,6 +48,7 @@ export interface GetTransactionGroupByRequest {
 		description?: string;
 		transaction_type_id?: number;
 		user_transaction_category_id?: string;
+		user_transaction_category_ids?: string[];
 		amount_range?: {
 			range_start: number;
 			range_end: number;
