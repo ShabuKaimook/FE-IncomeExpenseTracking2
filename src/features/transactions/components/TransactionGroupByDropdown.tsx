@@ -1,13 +1,13 @@
-import { DropDown } from "@/shared/components/DropDown";
 import { ArrowDown, ArrowUp, ChevronDown } from "lucide-react";
+import { DropDown } from "@/shared/components/DropDown";
 
 export type TransactionGroupBy = "date" | "type" | "category";
 export type TransactionGroupDirection = "asc" | "desc";
 
 interface TransactionGroupByDropdownProps {
-	value: TransactionGroupBy;
+	value: TransactionGroupBy | null;
 	direction: TransactionGroupDirection;
-	onChange: (value: TransactionGroupBy) => void;
+	onChange: (value: TransactionGroupBy | null) => void;
 	onDirectionChange: (value: TransactionGroupDirection) => void;
 	className?: string;
 }
@@ -18,10 +18,11 @@ const groupByOptions: { title: string; value: TransactionGroupBy }[] = [
 	{ title: "Transaction category", value: "category" },
 ];
 
-const directionOptions: { title: string; value: TransactionGroupDirection }[] = [
-	{ title: "Ascending", value: "asc" },
-	{ title: "Descending", value: "desc" },
-];
+const directionOptions: { title: string; value: TransactionGroupDirection }[] =
+	[
+		{ title: "Ascending", value: "asc" },
+		{ title: "Descending", value: "desc" },
+	];
 
 const TransactionGroupByDropdown = ({
 	value,
@@ -31,7 +32,7 @@ const TransactionGroupByDropdown = ({
 	className,
 }: TransactionGroupByDropdownProps) => {
 	const selectedGroupTitle =
-		groupByOptions.find((option) => option.value === value)?.title ?? "Date";
+		groupByOptions.find((option) => option.value === value)?.title ?? "None";
 	const DirectionIcon = direction === "asc" ? ArrowUp : ArrowDown;
 
 	return (
@@ -39,7 +40,7 @@ const TransactionGroupByDropdown = ({
 			triggerClassName={`h-11 min-h-11 bg-popover px-3 py-1 text-sm text-foreground focus:outline-primary border border-(--line) rounded-lg hover:border-primary/40 hover:bg-primary/5 transition w-full ${className ?? ""}`}
 			triggerLabel="Group by"
 			placeholder="Select group"
-			selectedValues={[value, direction]}
+			selectedValues={[...(value ? [value] : []), direction]}
 			sections={[
 				{
 					sectionType: "radio",
@@ -58,7 +59,8 @@ const TransactionGroupByDropdown = ({
 				}
 
 				if (section.sectionName === "Group by") {
-					onChange(item.value as TransactionGroupBy);
+					const nextValue = item.value as TransactionGroupBy;
+					onChange(nextValue === value ? null : nextValue);
 					return;
 				}
 
@@ -75,10 +77,15 @@ const TransactionGroupByDropdown = ({
 					<span className="truncate text-xs text-foreground">
 						{selectedGroupTitle}
 					</span>
-					<DirectionIcon size={14} className="shrink-0 text-primary" />
+					{value ? (
+						<DirectionIcon size={14} className="shrink-0 text-primary" />
+					) : null}
 				</div>
 			</span>
-			<ChevronDown size={17} className="shrink-0 text-muted-foreground" />
+			<ChevronDown
+				size={17}
+				className="shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180"
+			/>
 		</DropDown>
 	);
 };

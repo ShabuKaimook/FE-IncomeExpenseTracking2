@@ -1,6 +1,7 @@
 import { axiosInstance } from "@/shared/api/AxiosInstance";
 import type {
 	CreateTransactionRequest,
+	GetTransactionGroupByRequest,
 	GetTransactionRequest,
 	GetUserExpenseSummaryRequest,
 	GetUserExpenseTotalRequest,
@@ -8,6 +9,7 @@ import type {
 	GetUserSavingRateRequest,
 } from "./TransactionRequest";
 import type {
+	GetTransactionGroupByResponse,
 	GetUserSavingRateResponse,
 	GetUserTransactionSummaryResponse,
 	TransactionResponse,
@@ -25,6 +27,17 @@ export const TransactionService = {
 	): Promise<TransactionResponse[]> => {
 		const response = await axiosInstance.post<TransactionResponse[]>(
 			`${TRANSACTION_PREFIX}/me`,
+			req,
+		);
+
+		return response.data;
+	},
+
+	getTransactionGroupBy: async (
+		req: GetTransactionGroupByRequest,
+	): Promise<GetTransactionGroupByResponse[]> => {
+		const response = await axiosInstance.post<GetTransactionGroupByResponse[]>(
+			`${TRANSACTION_PREFIX}/group-by`,
 			req,
 		);
 

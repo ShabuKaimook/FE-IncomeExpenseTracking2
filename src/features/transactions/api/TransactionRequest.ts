@@ -10,9 +10,53 @@ export interface CreateTransactionRequest {
 }
 
 export interface GetTransactionRequest {
+	criteria?: {
+		description?: string;
+		transaction_type_id?: number;
+		user_transaction_category_id?: string;
+		amount_range?: {
+			range_start: number;
+			range_end: number;
+		};
+		start_date?: string;
+		end_date?: string;
+	};
+	group_by?: {
+		field: "transaction_type_id" | "user_transaction_category_id" | "date";
+		direction: "asc" | "desc";
+	};
+	order_by?: {
+		field:
+			| "transaction_type_id"
+			| "user_transaction_category_id"
+			| "date"
+			| "amount"
+			| "description";
+		direction: "asc" | "desc";
+	};
 	pagination?: {
 		limit: number;
-		offset: number;
+		page: number;
+	};
+}
+
+export interface GetTransactionGroupByRequest {
+	group_by: "transaction_type_id" | "user_transaction_category_id" | "date";
+	direction?: "asc" | "desc";
+	criteria?: {
+		description?: string;
+		transaction_type_id?: number;
+		user_transaction_category_id?: string;
+		amount_range?: {
+			range_start: number;
+			range_end: number;
+		};
+		start_date?: string;
+		end_date?: string;
+	};
+	pagination?: {
+		limit: number;
+		page: number;
 	};
 }
 

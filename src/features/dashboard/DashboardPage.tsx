@@ -3,8 +3,8 @@ import { toast } from "react-toastify";
 import { useUserExpenseTotal } from "@/features/transactions/hooks/useUserExpenseTotal";
 import { useUserIncomeTotal } from "@/features/transactions/hooks/useUserIncomeTotal";
 import { useUserTransactions } from "@/features/transactions/hooks/useUserTransactions";
+import { getThisMonthRange } from "@/shared/utils/date";
 import { formatRelativeDate } from "@/shared/utils/FormatDate";
-import { getThisMonthRange } from "@/shared/utils/Month";
 import ExpenseCategorySummaryDashboard from "./components/ExpenseCategorySummaryDashboard";
 import IncomeExpenseDashboardCard from "./components/IncomeExpenseDashboardCard";
 import NetBalanceDashboardCard from "./components/NetBalanceDashboardCard";
@@ -40,7 +40,7 @@ export default function DashboardPage() {
 		isLoading: isTransactionsLoading,
 		transactions,
 	} = useUserTransactions({
-		pagination: { limit: 5, offset: 0 },
+		pagination: { limit: 5, page: 0 },
 	});
 
 	const netBalance = incomeTotal - expenseTotal;

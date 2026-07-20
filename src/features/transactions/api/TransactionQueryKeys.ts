@@ -1,4 +1,5 @@
 import type {
+	GetTransactionGroupByRequest,
 	GetTransactionRequest,
 	GetUserExpenseSummaryRequest,
 	GetUserExpenseTotalRequest,
@@ -11,6 +12,8 @@ export const transactionKeys = {
 	lists: () => [...transactionKeys.all, "list"] as const,
 	list: (req: GetTransactionRequest) =>
 		[...transactionKeys.lists(), req] as const,
+	groupBy: (req: GetTransactionGroupByRequest) =>
+		[...transactionKeys.all, "group-by", req] as const,
 	incomeTotal: (req: GetUserIncomeTotalRequest) =>
 		[...transactionKeys.all, "income-total", req] as const,
 	expenseTotal: (req: GetUserExpenseTotalRequest) =>

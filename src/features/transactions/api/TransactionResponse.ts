@@ -19,3 +19,9 @@ export interface GetUserTransactionSummaryResponse {
 export interface GetUserSavingRateResponse {
 	saving_rate: number;
 }
+
+export interface GetTransactionGroupByResponse {
+	group_by_value: string | number;
+	group_by_label: string;
+	transaction_count: number;
+}

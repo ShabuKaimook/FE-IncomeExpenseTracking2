@@ -1,14 +1,18 @@
-import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { type CSSProperties, useEffect, useState } from "react";
 import {
   DayPicker,
   type DateRange as DayPickerDateRange,
   SelectionState,
   UI,
 } from "@daypicker/react";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { type CSSProperties, useEffect, useState } from "react";
 import "@daypicker/react/style.css";
-import { SegmentedControl, DropdownMenu } from "@radix-ui/themes";
-import { getThisMonthDateRange } from "@/shared/utils/Month";
+import { DropdownMenu, SegmentedControl } from "@radix-ui/themes";
+import {
+  getThisMonthDateRange,
+  getThisWeekDateRange,
+  getAllMonthShortNames,
+} from "@/shared/utils/date";
 
 type DatePickerMode = "month" | "custom";
 
@@ -25,10 +29,7 @@ export interface DatePickerProps {
   className?: string;
 }
 
-const monthNames = Array.from({ length: 12 }, (_, month) =>
-  new Date(2026, month, 1).toLocaleDateString("en-US", { month: "short" }),
-);
-
+// STYLES
 const headerButtonClassName =
   "inline-flex size-7 items-center justify-center rounded-lg text-primary-foreground transition hover:bg-primary-foreground/15 disabled:cursor-not-allowed disabled:opacity-40";
 
@@ -141,9 +142,12 @@ export const DateRangeWithShowDisabledNavigation = ({
       return;
     }
 
-    setStartDate(null);
-    setEndDate(null);
-    emitRangeChange("custom", null, null);
+    const weekRange = getThisWeekDateRange(new Date());
+    setStartDate(weekRange.startDate);
+    setEndDate(weekRange.endDate);
+    setVisibleMonth(weekRange.startDate);
+    onChange(weekRange.startDate);
+    emitRangeChange("custom", weekRange.startDate, weekRange.endDate);
   };
 
   const handleMonthChange = (date: Date | null) => {
@@ -198,12 +202,12 @@ export const DateRangeWithShowDisabledNavigation = ({
         }) ?? "Select month")
       : startDate && endDate
         ? `${startDate.toLocaleDateString("en-US", {
-            month: "short",
             day: "numeric",
+            month: "short",
             year: "numeric",
           })} - ${endDate.toLocaleDateString("en-US", {
-            month: "short",
             day: "numeric",
+            month: "short",
             year: "numeric",
           })}`
         : "Select date range";
@@ -276,7 +280,7 @@ export const DateRangeWithShowDisabledNavigation = ({
                   </button>
                 </div>
                 <div className="grid w-45 grid-cols-3 gap-2 p-2">
-                  {monthNames.map((monthName, month) => {
+                  {getAllMonthShortNames.map((monthName, month) => {
                     const isSelected =
                       value?.getFullYear() === visibleYear &&
                       value.getMonth() === month;
