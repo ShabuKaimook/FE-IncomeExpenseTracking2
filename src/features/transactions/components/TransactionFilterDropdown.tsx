@@ -43,7 +43,7 @@ const TransactionFilterDropdown = ({
 	const categoryOptions = useMemo(
 		() =>
 			categories.map((category) => ({
-				title: category.transaction_category_name,
+				title: category.user_transaction_category_name,
 				value: category.user_transaction_category_id,
 			})),
 		[categories],

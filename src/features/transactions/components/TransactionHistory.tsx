@@ -90,7 +90,7 @@ const buildGroupCriteria = (
 
 	return {
 		...baseCriteria,
-		user_transaction_category_id: String(groupValue),
+		user_transaction_category_ids: [String(groupValue)],
 	};
 };
 

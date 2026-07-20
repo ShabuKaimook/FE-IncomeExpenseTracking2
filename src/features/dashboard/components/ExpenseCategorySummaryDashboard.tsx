@@ -56,7 +56,7 @@ const ExpenseCategorySummaryDashboard = () => {
 			) : (
 				<PieChart
 					data={expenseCategorySummary.map((item) => ({
-						name: item.transaction_category_name,
+						name: item.user_transaction_category_name,
 						value: item.amount,
 					}))}
 					width="100%"
