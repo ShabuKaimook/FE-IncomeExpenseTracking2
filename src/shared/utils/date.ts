@@ -45,6 +45,12 @@ export const toDateOnly = (date: Date) =>
 		date.getDate(),
 	).padStart(2, "0")}`;
 
+export const fromDateOnly = (dateValue: string) => {
+	const [year, month, date] = dateValue.split("-").map(Number);
+
+	return new Date(year, month - 1, date);
+};
+
 export function getThisWeekDateRange(date: Date) {
 	const day = date.getDay();
 	const daysSinceMonday = day === 0 ? 6 : day - 1;

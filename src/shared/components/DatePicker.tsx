@@ -7,14 +7,15 @@ import {
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { type CSSProperties, useEffect, useState } from "react";
 import "@daypicker/react/style.css";
-import { DropdownMenu, SegmentedControl } from "@radix-ui/themes";
+import { DropdownMenu } from "@radix-ui/themes";
+import CustomSegmentedControl from "@/shared/components/CustomSegmentedControl";
 import {
+  getAllMonthShortNames,
   getThisMonthDateRange,
   getThisWeekDateRange,
-  getAllMonthShortNames,
 } from "@/shared/utils/date";
 
-type DatePickerMode = "month" | "custom";
+type DatePickerMode = "month" | "custom" | "single";
 
 export type DatePickerRange = {
   mode: DatePickerMode;
@@ -23,6 +24,7 @@ export type DatePickerRange = {
 };
 
 export interface DatePickerProps {
+  mode?: DatePickerMode;
   value: Date | null;
   onChange: (date: Date | null) => void;
   onRangeChange?: (range: DatePickerRange) => void;
@@ -62,41 +64,24 @@ const dayPickerStyles = {
   } as CSSProperties,
 };
 
-const segmentedControlRootClassName = [
-  "!rounded-lg",
-  "border",
-  "border-(--line)",
-  "!h-10",
-  "!bg-popover",
-  "!bg-none",
-  "![background-image:none]",
-  "hover:!bg-popover",
-  "hover:!bg-none",
-  "hover:![background-image:none]",
-  "hover:!border-primary/40",
-  "[&_.rt-SegmentedControlItemLabel]:!bg-transparent",
-  "[&_.rt-SegmentedControlItemLabel]:!px-2",
-  "[&_.rt-SegmentedControlItemLabel:hover]:!bg-transparent",
-  "[&_.rt-SegmentedControlItem[data-state=off]:hover_.rt-SegmentedControlItemLabel]:!bg-transparent",
-  "[&_.rt-SegmentedControlIndicator::before]:!rounded-lg",
-  "[&_.rt-SegmentedControlIndicator::before]:!inset-0",
-  "[&_.rt-SegmentedControlIndicator::before]:!bg-primary",
-  "[&_.rt-SegmentedControlItem[data-state=on]:hover~.rt-SegmentedControlIndicator::before]:!bg-primary/80",
-].join(" ");
-
-const segmentedControlItemClassName = [
-  "!cursor-pointer",
-  "data-[state=on]:!text-primary-foreground",
-].join(" ");
+const datePickerModeOptions: {
+  label: string;
+  value: DatePickerMode;
+}[] = [
+  { label: "Month", value: "month" },
+  { label: "Range", value: "custom" },
+  { label: "Single", value: "single" },
+];
 
 export const DateRangeWithShowDisabledNavigation = ({
+  mode,
   value,
   onChange,
   onRangeChange,
   className = "",
 }: DatePickerProps) => {
-  const [datePickerMode, setDatePickerMode] = useState<"month" | "custom">(
-    "month",
+  const [datePickerMode, setDatePickerMode] = useState<DatePickerMode>(
+    mode ?? "month",
   );
   const initialMonthRange = value ? getThisMonthDateRange(value) : null;
   const [startDate, setStartDate] = useState<Date | null>(
@@ -142,6 +127,16 @@ export const DateRangeWithShowDisabledNavigation = ({
       return;
     }
 
+    if (mode === "single") {
+      const selectedDate = value ?? new Date();
+      setStartDate(selectedDate);
+      setEndDate(selectedDate);
+      setVisibleMonth(selectedDate);
+      onChange(selectedDate);
+      emitRangeChange("single", selectedDate, selectedDate);
+      return;
+    }
+
     const weekRange = getThisWeekDateRange(new Date());
     setStartDate(weekRange.startDate);
     setEndDate(weekRange.endDate);
@@ -174,6 +169,18 @@ export const DateRangeWithShowDisabledNavigation = ({
     }
   };
 
+  const handleSingleDateChange = (date: Date | undefined) => {
+    const nextDate = date ?? null;
+    setStartDate(nextDate);
+    setEndDate(nextDate);
+    onChange(nextDate);
+    emitRangeChange("single", nextDate, nextDate);
+
+    if (nextDate) {
+      setIsOpen(false);
+    }
+  };
+
   const goToPreviousYear = () => {
     setVisibleMonth(
       (currentMonth) =>
@@ -200,43 +207,36 @@ export const DateRangeWithShowDisabledNavigation = ({
           month: "long",
           year: "numeric",
         }) ?? "Select month")
-      : startDate && endDate
-        ? `${startDate.toLocaleDateString("en-US", {
+      : datePickerMode === "single"
+        ? (startDate?.toLocaleDateString("en-US", {
             day: "numeric",
             month: "short",
             year: "numeric",
-          })} - ${endDate.toLocaleDateString("en-US", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          })}`
-        : "Select date range";
+          }) ?? "Select date")
+        : startDate && endDate
+          ? `${startDate.toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })} - ${endDate.toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}`
+          : "Select date range";
 
   return (
-    <div className="flex w-full items-center gap-2">
+    <div className="flex flex-col sm:flex-row w-full items-center gap-2">
       {/* MODE SELECTOR */}
-      <SegmentedControl.Root
-        className={segmentedControlRootClassName}
-        value={datePickerMode}
-        onValueChange={(mode) => {
-          if (mode === "month" || mode === "custom") {
-            handleModeChange(mode);
-          }
-        }}
-      >
-        <SegmentedControl.Item
-          className={segmentedControlItemClassName}
-          value="month"
-        >
-          Month
-        </SegmentedControl.Item>
-        <SegmentedControl.Item
-          className={segmentedControlItemClassName}
-          value="custom"
-        >
-          Custom
-        </SegmentedControl.Item>
-      </SegmentedControl.Root>
+      {mode == null && (
+        <CustomSegmentedControl
+          className="w-full sm:w-auto"
+          ariaLabel="Date picker mode"
+          value={datePickerMode}
+          options={datePickerModeOptions}
+          onValueChange={handleModeChange}
+        />
+      )}
 
       <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenu.Trigger>
@@ -301,6 +301,22 @@ export const DateRangeWithShowDisabledNavigation = ({
                     );
                   })}
                 </div>
+              </div>
+            ) : datePickerMode === "single" ? (
+              <div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
+                <DayPicker
+                  animate
+                  captionLayout="label"
+                  navLayout="around"
+                  mode="single"
+                  selected={startDate ?? undefined}
+                  onSelect={handleSingleDateChange}
+                  month={visibleMonth}
+                  onMonthChange={setVisibleMonth}
+                  showOutsideDays
+                  classNames={dayPickerClassNames}
+                  styles={dayPickerStyles}
+                />
               </div>
             ) : (
               <div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">

@@ -3,7 +3,7 @@ import AuthCallbackPage from "@/features/auth/AuthCallbackPage";
 import LoginPage from "@/features/auth/LoginPage";
 import { RequireAuth } from "@/features/auth/RequireAuth";
 import DashboardPage from "@/features/dashboard/DashboardPage";
-import TransactionCreatePage from "@/features/transactions/TransactionCreatePage";
+import TransactionCreatePage from "@/features/transactions/create/TransactionCreatePage";
 import TransactionPage from "@/features/transactions/TransactionPage";
 import { Route as rootRoute } from "./__root";
 
