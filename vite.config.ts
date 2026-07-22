@@ -1,4 +1,5 @@
 import babel from "@rolldown/plugin-babel";
+import netlify from "@netlify/vite-plugin-tanstack-start";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
@@ -19,6 +20,7 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact(),
 		babel({ presets: [reactCompilerPreset()] }),
+		netlify(),
 	],
 	server: {
 		allowedHosts: ["clapped-unpummelled-penni.ngrok-free.dev"],
