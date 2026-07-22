@@ -59,7 +59,6 @@ export default function TransactionCreatePage() {
 	const [form, setForm] = useState<FormState>(emptyForm);
 	const [selectedImage, setSelectedImage] = useState<File | null>(null);
 	const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-	const [ocrText, setOcrText] = useState<string>("");
 	const { categories, isLoading: isCategoryLoading } =
 		useUserTransactionCategories();
 	const createTransaction = useCreateTransaction();
@@ -74,7 +73,6 @@ export default function TransactionCreatePage() {
 				date: response.draft.date,
 				userTransactionCategoryId: response.draft.user_transaction_category_id,
 			});
-			setOcrText(response.ocr?.text ?? "");
 			toast.success("Image scanned. Review the draft before saving.");
 		},
 		onError: () => {
@@ -113,7 +111,6 @@ export default function TransactionCreatePage() {
 	const handleImageChange: ChangeEventHandler<HTMLInputElement> = (event) => {
 		const file = event.target.files?.[0] ?? null;
 		setSelectedImage(file);
-		setOcrText("");
 
 		if (imagePreviewUrl) {
 			URL.revokeObjectURL(imagePreviewUrl);
@@ -210,7 +207,6 @@ export default function TransactionCreatePage() {
 						<TransactionCreateImagePreview
 							imagePreviewUrl={imagePreviewUrl}
 							isScanning={draftFromImage.isPending}
-							ocrText={ocrText}
 							onImageChange={handleImageChange}
 							onScanImage={handleScanImage}
 							selectedImage={selectedImage}
@@ -327,7 +323,7 @@ export default function TransactionCreatePage() {
 								</div>
 								<DateRangeWithShowDisabledNavigation
 									mode="single"
-									value={fromDateOnly(form.date)}
+									value={form.date ? fromDateOnly(form.date) : new Date()}
 									onChange={(date) => {
 										if (date) {
 											updateForm("date", toDateOnly(date));
@@ -402,7 +398,6 @@ export default function TransactionCreatePage() {
 								type="button"
 								onClick={() => {
 									setForm(emptyForm());
-									setOcrText("");
 								}}
 								className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-(--line) px-4 text-sm font-semibold text-foreground transition hover:bg-(--surface-strong) w-full sm:w-auto"
 							>

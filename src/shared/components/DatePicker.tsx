@@ -1,8 +1,8 @@
 import {
-  DayPicker,
-  type DateRange as DayPickerDateRange,
-  SelectionState,
-  UI,
+	DayPicker,
+	type DateRange as DayPickerDateRange,
+	SelectionState,
+	UI,
 } from "@daypicker/react";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { type CSSProperties, useEffect, useState } from "react";
@@ -10,338 +10,369 @@ import "@daypicker/react/style.css";
 import { DropdownMenu } from "@radix-ui/themes";
 import CustomSegmentedControl from "@/shared/components/CustomSegmentedControl";
 import {
-  getAllMonthShortNames,
-  getThisMonthDateRange,
-  getThisWeekDateRange,
+	getAllMonthShortNames,
+	getThisMonthDateRange,
+	getThisWeekDateRange,
 } from "@/shared/utils/date";
 
 type DatePickerMode = "month" | "custom" | "single";
 
 export type DatePickerRange = {
-  mode: DatePickerMode;
-  startDate: Date | null;
-  endDate: Date | null;
+	mode: DatePickerMode;
+	startDate: Date | null;
+	endDate: Date | null;
 };
 
 export interface DatePickerProps {
-  mode?: DatePickerMode;
-  value: Date | null;
-  onChange: (date: Date | null) => void;
-  onRangeChange?: (range: DatePickerRange) => void;
-  className?: string;
+	mode?: DatePickerMode;
+	value: Date | null;
+	onChange: (date: Date | null) => void;
+	onRangeChange?: (range: DatePickerRange) => void;
+	className?: string;
 }
 
 // STYLES
 const headerButtonClassName =
-  "inline-flex size-7 items-center justify-center rounded-lg text-primary-foreground transition hover:bg-primary-foreground/15 disabled:cursor-not-allowed disabled:opacity-40";
+	"inline-flex size-7 items-center justify-center rounded-lg text-primary-foreground transition hover:bg-primary-foreground/15 disabled:cursor-not-allowed disabled:opacity-40";
 
 const calendarSurfaceClassName =
-  "overflow-hidden rounded-lg border border-(--line) bg-popover shadow-sm";
+	"overflow-hidden rounded-lg border border-(--line) bg-popover shadow-sm";
 
 const dayPickerClassNames = {
-  [UI.Weekday]: "h-5 text-xs font-medium text-muted-foreground",
-  [UI.Day]: "size-7 p-0",
-  [UI.MonthCaption]:
-    "flex h-10 items-center justify-center bg-primary text-sm font-bold text-primary-foreground rounded-t-lg mb-1",
-  [UI.DayButton]:
-    "flex size-8 items-center justify-center rounded-lg text-xs text-(--sea-ink-soft) transition hover:bg-primary/30 hover:text-(--sea-ink) focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary",
-  [SelectionState.selected]: "[&>button]:rounded-lg [&>button]:bg-primary",
-  [SelectionState.range_start]:
-    "rounded-lg bg-primary/10 [&>button]:rounded-l-lg [&>button]:rounded-r-none [&>button]:bg-primary [&>button]:text-primary-foreground",
-  [SelectionState.range_middle]:
-    "[&>button]:rounded-none [&>button]:bg-primary/10 [&>button]:text-muted-foreground/80",
-  [SelectionState.range_end]:
-    "rounded-r-lg bg-primary/10 [&>button]:rounded-l-none [&>button]:rounded-r-lg [&>button]:bg-primary [&>button]:text-primary-foreground",
-  [UI.Chevron]:
-    "fill-popover text-(--sea-ink-soft) transition hover:text-(--sea-ink) size-4 [&>svg]:size-3 [&>svg]:stroke-(--sea-ink-soft) [&>svg]:transition [&>svg]:hover:stroke-(--sea-ink)",
+	[UI.Weekday]: "h-5 text-xs font-medium text-muted-foreground",
+	[UI.Day]: "size-7 p-0",
+	[UI.MonthCaption]:
+		"flex h-10 items-center justify-center bg-primary text-sm font-bold text-primary-foreground rounded-t-lg mb-1",
+	[UI.DayButton]:
+		"flex size-8 items-center justify-center rounded-lg text-xs text-(--sea-ink-soft) transition hover:bg-primary/30 hover:text-(--sea-ink) focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary",
+	[SelectionState.selected]: "[&>button]:rounded-lg [&>button]:bg-primary",
+	[SelectionState.range_start]:
+		"rounded-lg bg-primary/10 [&>button]:rounded-l-lg [&>button]:rounded-r-none [&>button]:bg-primary [&>button]:text-primary-foreground",
+	[SelectionState.range_middle]:
+		"[&>button]:rounded-none [&>button]:bg-primary/10 [&>button]:text-muted-foreground/80",
+	[SelectionState.range_end]:
+		"rounded-r-lg bg-primary/10 [&>button]:rounded-l-none [&>button]:rounded-r-lg [&>button]:bg-primary [&>button]:text-primary-foreground",
+	[UI.Chevron]:
+		"fill-popover text-(--sea-ink-soft) transition hover:text-(--sea-ink) size-4 [&>svg]:size-3 [&>svg]:stroke-(--sea-ink-soft) [&>svg]:transition [&>svg]:hover:stroke-(--sea-ink)",
 };
 
 const dayPickerStyles = {
-  root: {
-    "--rdp-accent-color": "var(--primary)",
-    "--rdp-accent-background-color":
-      "color-mix(in oklab, var(--primary) 12%, transparent)",
-  } as CSSProperties,
+	root: {
+		"--rdp-accent-color": "var(--primary)",
+		"--rdp-accent-background-color":
+			"color-mix(in oklab, var(--primary) 12%, transparent)",
+	} as CSSProperties,
 };
 
 const datePickerModeOptions: {
-  label: string;
-  value: DatePickerMode;
+	label: string;
+	value: DatePickerMode;
 }[] = [
-  { label: "Month", value: "month" },
-  { label: "Range", value: "custom" },
-  { label: "Single", value: "single" },
+	{ label: "Month", value: "month" },
+	{ label: "Range", value: "custom" },
+	{ label: "Single", value: "single" },
 ];
 
+const getInitialDateRange = (mode: DatePickerMode, value: Date | null) => {
+	if (!value) {
+		return {
+			startDate: null,
+			endDate: null,
+		};
+	}
+
+	if (mode === "month") {
+		return getThisMonthDateRange(value);
+	}
+
+	if (mode === "custom") {
+		return getThisWeekDateRange(value);
+	}
+
+	return {
+		startDate: value,
+		endDate: value,
+	};
+};
+
 export const DateRangeWithShowDisabledNavigation = ({
-  mode,
-  value,
-  onChange,
-  onRangeChange,
-  className = "",
+	mode,
+	value,
+	onChange,
+	onRangeChange,
+	className = "",
 }: DatePickerProps) => {
-  const [datePickerMode, setDatePickerMode] = useState<DatePickerMode>(
-    mode ?? "month",
-  );
-  const initialMonthRange = value ? getThisMonthDateRange(value) : null;
-  const [startDate, setStartDate] = useState<Date | null>(
-    initialMonthRange?.startDate ?? null,
-  );
-  const [endDate, setEndDate] = useState<Date | null>(
-    initialMonthRange?.endDate ?? null,
-  );
-  const [isOpen, setIsOpen] = useState(false);
-  const [visibleMonth, setVisibleMonth] = useState(value ?? new Date());
-  const visibleYear = visibleMonth.getFullYear();
+	const [datePickerMode, setDatePickerMode] = useState<DatePickerMode>(
+		mode ?? "month",
+	);
+	const initialDateRange = getInitialDateRange(datePickerMode, value);
 
-  useEffect(() => {
-    if (!value || datePickerMode !== "month") {
-      return;
-    }
+	const [startDate, setStartDate] = useState<Date | null>(
+		initialDateRange.startDate,
+	);
+	const [endDate, setEndDate] = useState<Date | null>(initialDateRange.endDate);
+	const [isOpen, setIsOpen] = useState(false);
+	const [visibleMonth, setVisibleMonth] = useState(value ?? new Date());
+	const visibleYear = visibleMonth.getFullYear();
 
-    const monthRange = getThisMonthDateRange(value);
-    setStartDate(monthRange.startDate);
-    setEndDate(monthRange.endDate);
-  }, [datePickerMode, value]);
+	useEffect(() => {
+		if (!value || datePickerMode !== "month") {
+			return;
+		}
 
-  const emitRangeChange = (
-    mode: DatePickerMode,
-    nextStartDate: Date | null,
-    nextEndDate: Date | null,
-  ) => {
-    onRangeChange?.({
-      mode,
-      startDate: nextStartDate,
-      endDate: nextEndDate,
-    });
-  };
+		const monthRange = getThisMonthDateRange(value);
+		setStartDate(monthRange.startDate);
+		setEndDate(monthRange.endDate);
+	}, [datePickerMode, value]);
 
-  const handleModeChange = (mode: DatePickerMode) => {
-    setDatePickerMode(mode);
+	useEffect(() => {
+		if (!value || datePickerMode !== "single") {
+			return;
+		}
 
-    if (mode === "month" && value) {
-      const monthRange = getThisMonthDateRange(value);
-      setStartDate(monthRange.startDate);
-      setEndDate(monthRange.endDate);
-      emitRangeChange("month", monthRange.startDate, monthRange.endDate);
-      return;
-    }
+		setStartDate(value);
+		setEndDate(value);
+		setVisibleMonth(value);
+	}, [datePickerMode, value]);
 
-    if (mode === "single") {
-      const selectedDate = value ?? new Date();
-      setStartDate(selectedDate);
-      setEndDate(selectedDate);
-      setVisibleMonth(selectedDate);
-      onChange(selectedDate);
-      emitRangeChange("single", selectedDate, selectedDate);
-      return;
-    }
+	const emitRangeChange = (
+		mode: DatePickerMode,
+		nextStartDate: Date | null,
+		nextEndDate: Date | null,
+	) => {
+		onRangeChange?.({
+			mode,
+			startDate: nextStartDate,
+			endDate: nextEndDate,
+		});
+	};
 
-    const weekRange = getThisWeekDateRange(new Date());
-    setStartDate(weekRange.startDate);
-    setEndDate(weekRange.endDate);
-    setVisibleMonth(weekRange.startDate);
-    onChange(weekRange.startDate);
-    emitRangeChange("custom", weekRange.startDate, weekRange.endDate);
-  };
+	const handleModeChange = (mode: DatePickerMode) => {
+		setDatePickerMode(mode);
 
-  const handleMonthChange = (date: Date | null) => {
-    if (!date) return;
+		if (mode === "month" && value) {
+			const monthRange = getThisMonthDateRange(value);
+			setStartDate(monthRange.startDate);
+			setEndDate(monthRange.endDate);
+			emitRangeChange("month", monthRange.startDate, monthRange.endDate);
+			return;
+		}
 
-    const monthRange = getThisMonthDateRange(date);
-    setStartDate(monthRange.startDate);
-    setEndDate(monthRange.endDate);
-    onChange(monthRange.startDate);
-    emitRangeChange("month", monthRange.startDate, monthRange.endDate);
-    setIsOpen(false);
-  };
+		if (mode === "single") {
+			const selectedDate = value ?? new Date();
+			setStartDate(selectedDate);
+			setEndDate(selectedDate);
+			setVisibleMonth(selectedDate);
+			onChange(selectedDate);
+			emitRangeChange("single", selectedDate, selectedDate);
+			return;
+		}
 
-  const handleCustomRangeChange = (range: DayPickerDateRange | undefined) => {
-    const nextStartDate = range?.from ?? null;
-    const nextEndDate = range?.to ?? null;
-    setStartDate(nextStartDate);
-    setEndDate(nextEndDate);
-    onChange(nextStartDate);
-    emitRangeChange("custom", nextStartDate, nextEndDate);
+		const weekRange = getThisWeekDateRange(new Date());
+		setStartDate(weekRange.startDate);
+		setEndDate(weekRange.endDate);
+		setVisibleMonth(weekRange.startDate);
+		onChange(weekRange.startDate);
+		emitRangeChange("custom", weekRange.startDate, weekRange.endDate);
+	};
 
-    if (nextStartDate && nextEndDate) {
-      setIsOpen(false);
-    }
-  };
+	const handleMonthChange = (date: Date | null) => {
+		if (!date) return;
 
-  const handleSingleDateChange = (date: Date | undefined) => {
-    const nextDate = date ?? null;
-    setStartDate(nextDate);
-    setEndDate(nextDate);
-    onChange(nextDate);
-    emitRangeChange("single", nextDate, nextDate);
+		const monthRange = getThisMonthDateRange(date);
+		setStartDate(monthRange.startDate);
+		setEndDate(monthRange.endDate);
+		onChange(monthRange.startDate);
+		emitRangeChange("month", monthRange.startDate, monthRange.endDate);
+		setIsOpen(false);
+	};
 
-    if (nextDate) {
-      setIsOpen(false);
-    }
-  };
+	const handleCustomRangeChange = (range: DayPickerDateRange | undefined) => {
+		const nextStartDate = range?.from ?? null;
+		const nextEndDate = range?.to ?? null;
+		setStartDate(nextStartDate);
+		setEndDate(nextEndDate);
+		onChange(nextStartDate);
+		emitRangeChange("custom", nextStartDate, nextEndDate);
 
-  const goToPreviousYear = () => {
-    setVisibleMonth(
-      (currentMonth) =>
-        new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1),
-    );
-  };
+		if (nextStartDate && nextEndDate) {
+			setIsOpen(false);
+		}
+	};
 
-  const goToNextYear = () => {
-    setVisibleMonth(
-      (currentMonth) =>
-        new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1),
-    );
-  };
+	const handleSingleDateChange = (date: Date | undefined) => {
+		const nextDate = date ?? null;
+		setStartDate(nextDate);
+		setEndDate(nextDate);
+		onChange(nextDate);
+		emitRangeChange("single", nextDate, nextDate);
 
-  const handleMonthButtonClick = (month: number) => {
-    const selectedMonthDate = new Date(visibleYear, month, 1);
-    setVisibleMonth(selectedMonthDate);
-    handleMonthChange(selectedMonthDate);
-  };
+		if (nextDate) {
+			setIsOpen(false);
+		}
+	};
 
-  const triggerLabel =
-    datePickerMode === "month"
-      ? (value?.toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        }) ?? "Select month")
-      : datePickerMode === "single"
-        ? (startDate?.toLocaleDateString("en-US", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }) ?? "Select date")
-        : startDate && endDate
-          ? `${startDate.toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })} - ${endDate.toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}`
-          : "Select date range";
+	const goToPreviousYear = () => {
+		setVisibleMonth(
+			(currentMonth) =>
+				new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1),
+		);
+	};
 
-  return (
-    <div className="flex flex-col sm:flex-row w-full items-center gap-2">
-      {/* MODE SELECTOR */}
-      {mode == null && (
-        <CustomSegmentedControl
-          className="w-full sm:w-auto"
-          ariaLabel="Date picker mode"
-          value={datePickerMode}
-          options={datePickerModeOptions}
-          onValueChange={handleModeChange}
-        />
-      )}
+	const goToNextYear = () => {
+		setVisibleMonth(
+			(currentMonth) =>
+				new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1),
+		);
+	};
 
-      <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
-        <DropdownMenu.Trigger>
-          <button
-            type="button"
-            className={`flex h-10 w-full sm:w-45 cursor-pointer items-center gap-3 rounded-lg border border-(--line) bg-popover px-3 text-sm focus:outline-primary transition hover:border-primary/40 ${className}`}
-          >
-            <CalendarDays size={17} className="shrink-0 text-primary" />
-            <span className="truncate font-medium text-foreground">
-              {triggerLabel}
-            </span>
-          </button>
-        </DropdownMenu.Trigger>
+	const handleMonthButtonClick = (month: number) => {
+		const selectedMonthDate = new Date(visibleYear, month, 1);
+		setVisibleMonth(selectedMonthDate);
+		handleMonthChange(selectedMonthDate);
+	};
 
-        <DropdownMenu.Content
-          align="start"
-          className="z-9999! border-none! bg-transparent! p-0! shadow-none!"
-        >
-          <div>
-            {datePickerMode === "month" ? (
-              <div className={calendarSurfaceClassName}>
-                <div className="flex h-10 items-center justify-between bg-primary px-3">
-                  <button
-                    type="button"
-                    className={headerButtonClassName}
-                    onClick={goToPreviousYear}
-                    aria-label="Previous year"
-                  >
-                    <ChevronLeft size={16} strokeWidth={2.5} />
-                  </button>
-                  <span className="text-sm font-semibold text-primary-foreground">
-                    {visibleYear}
-                  </span>
-                  <button
-                    type="button"
-                    className={headerButtonClassName}
-                    onClick={goToNextYear}
-                    aria-label="Next year"
-                  >
-                    <ChevronRight size={16} strokeWidth={2.5} />
-                  </button>
-                </div>
-                <div className="grid w-45 grid-cols-3 gap-2 p-2">
-                  {getAllMonthShortNames.map((monthName, month) => {
-                    const isSelected =
-                      value?.getFullYear() === visibleYear &&
-                      value.getMonth() === month;
+	const triggerLabel =
+		datePickerMode === "month"
+			? (value?.toLocaleDateString("en-US", {
+					month: "long",
+					year: "numeric",
+				}) ?? "Select month")
+			: datePickerMode === "single"
+				? (startDate?.toLocaleDateString("en-US", {
+						day: "numeric",
+						month: "short",
+						year: "numeric",
+					}) ?? "Select date")
+				: startDate && endDate
+					? `${startDate.toLocaleDateString("en-US", {
+							day: "numeric",
+							month: "short",
+							year: "numeric",
+						})} - ${endDate.toLocaleDateString("en-US", {
+							day: "numeric",
+							month: "short",
+							year: "numeric",
+						})}`
+					: "Select date range";
 
-                    return (
-                      <button
-                        key={monthName}
-                        type="button"
-                        className={`h-7 whitespace-nowrap rounded-lg text-sm transition ${
-                          isSelected
-                            ? "bg-primary text-primary-foreground"
-                            : "text-(--sea-ink-soft) hover:bg-primary/30 hover:text-(--sea-ink)"
-                        }`}
-                        onClick={() => handleMonthButtonClick(month)}
-                      >
-                        {monthName}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : datePickerMode === "single" ? (
-              <div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
-                <DayPicker
-                  animate
-                  captionLayout="label"
-                  navLayout="around"
-                  mode="single"
-                  selected={startDate ?? undefined}
-                  onSelect={handleSingleDateChange}
-                  month={visibleMonth}
-                  onMonthChange={setVisibleMonth}
-                  showOutsideDays
-                  classNames={dayPickerClassNames}
-                  styles={dayPickerStyles}
-                />
-              </div>
-            ) : (
-              <div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
-                <DayPicker
-                  animate
-                  captionLayout="label"
-                  navLayout="around"
-                  mode="range"
-                  selected={{
-                    from: startDate ?? undefined,
-                    to: endDate ?? undefined,
-                  }}
-                  onSelect={handleCustomRangeChange}
-                  month={visibleMonth}
-                  onMonthChange={setVisibleMonth}
-                  showOutsideDays
-                  resetOnSelect
-                  classNames={dayPickerClassNames}
-                  styles={dayPickerStyles}
-                />
-              </div>
-            )}
-          </div>
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
-    </div>
-  );
+	return (
+		<div className="flex flex-col sm:flex-row w-full items-center gap-2">
+			{/* MODE SELECTOR */}
+			{mode == null && (
+				<CustomSegmentedControl
+					className="w-full sm:w-auto"
+					ariaLabel="Date picker mode"
+					value={datePickerMode}
+					options={datePickerModeOptions}
+					onValueChange={handleModeChange}
+				/>
+			)}
+
+			<DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
+				<DropdownMenu.Trigger>
+					<button
+						type="button"
+						className={`flex h-10 w-full sm:w-45 cursor-pointer items-center gap-3 rounded-lg border border-(--line) bg-popover px-3 text-sm focus:outline-primary transition hover:border-primary/40 ${className}`}
+					>
+						<CalendarDays size={17} className="shrink-0 text-primary" />
+						<span className="truncate font-medium text-foreground">
+							{triggerLabel}
+						</span>
+					</button>
+				</DropdownMenu.Trigger>
+
+				<DropdownMenu.Content
+					align="start"
+					className="z-9999! border-none! bg-transparent! p-0! shadow-none!"
+				>
+					<div>
+						{datePickerMode === "month" ? (
+							<div className={calendarSurfaceClassName}>
+								<div className="flex h-10 items-center justify-between bg-primary px-3">
+									<button
+										type="button"
+										className={headerButtonClassName}
+										onClick={goToPreviousYear}
+										aria-label="Previous year"
+									>
+										<ChevronLeft size={16} strokeWidth={2.5} />
+									</button>
+									<span className="text-sm font-semibold text-primary-foreground">
+										{visibleYear}
+									</span>
+									<button
+										type="button"
+										className={headerButtonClassName}
+										onClick={goToNextYear}
+										aria-label="Next year"
+									>
+										<ChevronRight size={16} strokeWidth={2.5} />
+									</button>
+								</div>
+								<div className="grid w-45 grid-cols-3 gap-2 p-2">
+									{getAllMonthShortNames.map((monthName, month) => {
+										const isSelected =
+											value?.getFullYear() === visibleYear &&
+											value.getMonth() === month;
+
+										return (
+											<button
+												key={monthName}
+												type="button"
+												className={`h-7 whitespace-nowrap rounded-lg text-sm transition ${
+													isSelected
+														? "bg-primary text-primary-foreground"
+														: "text-(--sea-ink-soft) hover:bg-primary/30 hover:text-(--sea-ink)"
+												}`}
+												onClick={() => handleMonthButtonClick(month)}
+											>
+												{monthName}
+											</button>
+										);
+									})}
+								</div>
+							</div>
+						) : datePickerMode === "single" ? (
+							<div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
+								<DayPicker
+									animate
+									captionLayout="label"
+									navLayout="around"
+									mode="single"
+									selected={startDate ?? undefined}
+									onSelect={handleSingleDateChange}
+									month={visibleMonth}
+									onMonthChange={setVisibleMonth}
+									showOutsideDays
+									classNames={dayPickerClassNames}
+									styles={dayPickerStyles}
+								/>
+							</div>
+						) : (
+							<div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
+								<DayPicker
+									animate
+									captionLayout="label"
+									navLayout="around"
+									mode="range"
+									selected={{
+										from: startDate ?? undefined,
+										to: endDate ?? undefined,
+									}}
+									onSelect={handleCustomRangeChange}
+									month={visibleMonth}
+									onMonthChange={setVisibleMonth}
+									showOutsideDays
+									resetOnSelect
+									classNames={dayPickerClassNames}
+									styles={dayPickerStyles}
+								/>
+							</div>
+						)}
+					</div>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		</div>
+	);
 };

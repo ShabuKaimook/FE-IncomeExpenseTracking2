@@ -25,3 +25,25 @@ export interface GetTransactionGroupByResponse {
 	group_by_label: string;
 	transaction_count: number;
 }
+
+export interface TransactionDraftResponse {
+	draft: {
+		amount: number;
+		currency_code: string;
+		description: string;
+		date: string;
+		transaction_type_id: number;
+		transaction_type_name: string;
+		user_transaction_category_id: string;
+		user_transaction_category_name: string;
+	};
+	ai: {
+		raw_type: string | null;
+		raw_category: string | null;
+		raw_description: string | null;
+	};
+	ocr?: {
+		text: string;
+		lines: string[];
+	};
+}

@@ -12,6 +12,7 @@ import type {
 	GetTransactionGroupByResponse,
 	GetUserSavingRateResponse,
 	GetUserTransactionSummaryResponse,
+	TransactionDraftResponse,
 	TransactionResponse,
 } from "./TransactionResponse";
 
@@ -20,6 +21,25 @@ const TRANSACTION_PREFIX = "/transaction";
 export const TransactionService = {
 	createTransaction: async (body: CreateTransactionRequest): Promise<void> => {
 		await axiosInstance.post(`${TRANSACTION_PREFIX}/create`, body);
+	},
+
+	createTransactionDraftFromImage: async (
+		file: File,
+	): Promise<TransactionDraftResponse> => {
+		const formData = new FormData();
+		formData.append("file", file);
+
+		const response = await axiosInstance.post<TransactionDraftResponse>(
+			`${TRANSACTION_PREFIX}/ai/draft/image`,
+			formData,
+			{
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			},
+		);
+
+		return response.data;
 	},
 
 	getUserTransactions: async (
