@@ -55,14 +55,14 @@ bun run check
 1. Create a LINE Login channel in the LINE Developers Console
 2. Add this callback URL to the LINE Login channel:
    ```bash
-   https://clapped-unpummelled-penni.ngrok-free.dev/auth/line/callback
+   https://your-frontend.example.com/auth/line/callback
    ```
 3. Set frontend env values in `.env.local`:
    ```bash
-   VITE_API_BASE_URL=http://localhost:3002/api/v1
-   VITE_LINE_LOGIN_CHANNEL_ID=2010169417
-   VITE_LINE_REDIRECT_URI=https://clapped-unpummelled-penni.ngrok-free.dev/auth/line/callback
-   VITE_FAKE_AUTH_TOKEN=fake-dev-access-token
+   VITE_API_BASE_URL=https://your-backend.example.com/api/v1
+   VITE_LINE_LOGIN_CHANNEL_ID=your_line_login_channel_id
+   VITE_LINE_REDIRECT_URI=https://your-frontend.example.com/auth/line/callback
+   VITE_FAKE_AUTH_TOKEN=
    ```
 4. Set backend env values:
    ```bash
