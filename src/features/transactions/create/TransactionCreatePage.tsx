@@ -119,6 +119,16 @@ export default function TransactionCreatePage() {
 		setImagePreviewUrl(file ? URL.createObjectURL(file) : null);
 	};
 
+	const handleClearImage = () => {
+		setSelectedImage(null);
+
+		if (imagePreviewUrl) {
+			URL.revokeObjectURL(imagePreviewUrl);
+		}
+
+		setImagePreviewUrl(null);
+	};
+
 	const handleScanImage = () => {
 		if (!selectedImage) {
 			toast.error("Choose an image first.");
@@ -207,6 +217,7 @@ export default function TransactionCreatePage() {
 						<TransactionCreateImagePreview
 							imagePreviewUrl={imagePreviewUrl}
 							isScanning={draftFromImage.isPending}
+							onClearImage={handleClearImage}
 							onImageChange={handleImageChange}
 							onScanImage={handleScanImage}
 							selectedImage={selectedImage}

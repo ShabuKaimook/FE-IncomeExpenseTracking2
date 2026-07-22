@@ -4,6 +4,7 @@ import type { ChangeEventHandler } from "react";
 interface TransactionCreateImagePreviewProps {
 	imagePreviewUrl: string | null;
 	isScanning: boolean;
+	onClearImage: () => void;
 	onImageChange: ChangeEventHandler<HTMLInputElement>;
 	onScanImage: () => void;
 	selectedImage: File | null;
@@ -12,6 +13,7 @@ interface TransactionCreateImagePreviewProps {
 export const TransactionCreateImagePreview = ({
 	imagePreviewUrl,
 	isScanning,
+	onClearImage,
 	onImageChange,
 	onScanImage,
 	selectedImage,
@@ -34,7 +36,7 @@ export const TransactionCreateImagePreview = ({
 							className="absolute top-2 right-2 rounded-full bg-primary/10 p-1 text-primary transition hover:bg-primary/20"
 							onClick={(e) => {
 								e.stopPropagation();
-								onImageChange({ target: { files: null } } as any);
+								onClearImage();
 							}}
 						>
 							<X size={17} />
