@@ -9,10 +9,10 @@ import { DashboardCard } from "@/shared/components/DashboardCard";
 import { ChartSkeleton } from "@/shared/components/Skeleton";
 import { ChartTheme } from "@/shared/constants/ChartThemeEnum";
 import { PERIOD_MODE } from "@/shared/constants/Period";
-import { getThisMonthRange } from "@/shared/utils/date";
+import { getCurrentMonthDateRange } from "@/shared/utils/date";
 
 export const SpendingTrendDashboardCard = () => {
-	const thisMonthRange = getThisMonthRange();
+	const thisMonthRange = getCurrentMonthDateRange();
 
 	const {
 		error: expenseSummaryError,

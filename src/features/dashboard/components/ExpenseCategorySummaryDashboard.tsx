@@ -7,9 +7,10 @@ import { PieChart } from "@/shared/charts/PieChart";
 import { DashboardCard } from "@/shared/components/DashboardCard";
 import { ChartSkeleton } from "@/shared/components/Skeleton";
 import { TRANSACTION_TYPE } from "@/shared/constants/TransactionTypeEnum";
-import { getThisMonthRange } from "@/shared/utils/date";
+import { getCurrentMonthDateRange } from "@/shared/utils/date";
 
 const ExpenseCategorySummaryDashboard = () => {
+	const currentMonthRange = getCurrentMonthDateRange();
 	const {
 		summary: expenseCategorySummary,
 		error,
@@ -17,8 +18,8 @@ const ExpenseCategorySummaryDashboard = () => {
 	} = useUserTransactionCategorySummary({
 		periods: [
 			{
-				start_date: getThisMonthRange().startDate,
-				end_date: getThisMonthRange().endDate,
+				start_date: currentMonthRange.startDate,
+				end_date: currentMonthRange.endDate,
 			},
 		],
 		criteria: {

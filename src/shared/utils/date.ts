@@ -1,15 +1,10 @@
-export function getThisMonthRange() {
-	const now = new Date();
-	const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-	const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+type DateInput = Date | number | string;
 
-	return {
-		startDate,
-		endDate,
-	};
-}
+const secondsInMinute = 60;
+const secondsInHour = secondsInMinute * 60;
+const secondsInDay = secondsInHour * 24;
 
-export function getThisMonthDateRange(date: Date) {
+export function getMonthDateRange(date: Date) {
 	const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
 	const endDate = new Date(
 		date.getFullYear(),
@@ -27,31 +22,35 @@ export function getThisMonthDateRange(date: Date) {
 	};
 }
 
+export function getCurrentMonthDateRange() {
+	return getMonthDateRange(new Date());
+}
+
 export const getAllMonthShortNames = Array.from({ length: 12 }, (_, month) =>
 	new Date(2026, month, 1).toLocaleDateString("en-US", { month: "short" }),
 );
 
-export const toMonthValue = (date: Date) =>
+export const dateToYearMonthString = (date: Date) =>
 	`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
-export const fromMonthValue = (monthValue: string) => {
-	const [year, month] = monthValue.split("-").map(Number);
+export const yearMonthStringToDate = (yearMonthValue: string) => {
+	const [year, month] = yearMonthValue.split("-").map(Number);
 
 	return new Date(year, month - 1, 1);
 };
 
-export const toDateOnly = (date: Date) =>
+export const dateToString = (date: Date) =>
 	`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
 		date.getDate(),
 	).padStart(2, "0")}`;
 
-export const fromDateOnly = (dateValue: string) => {
+export const stringToDate = (dateValue: string) => {
 	const [year, month, date] = dateValue.split("-").map(Number);
 
 	return new Date(year, month - 1, date);
 };
 
-export function getThisWeekDateRange(date: Date) {
+export function getWeekDateRange(date: Date) {
 	const day = date.getDay();
 	const daysSinceMonday = day === 0 ? 6 : day - 1;
 	const startDate = new Date(date);
@@ -68,13 +67,57 @@ export function getThisWeekDateRange(date: Date) {
 	};
 }
 
-export function getLastMonthRange() {
+export function getPreviousMonthDateRange() {
 	const now = new Date();
-	const startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-	const endDate = new Date(now.getFullYear(), now.getMonth(), 0);
-
-	return {
-		startDate,
-		endDate,
-	};
+	return getMonthDateRange(new Date(now.getFullYear(), now.getMonth() - 1, 1));
 }
+
+const getStartOfDay = (date: Date) =>
+	new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+const formatFullDate = (date: Date) =>
+	new Intl.DateTimeFormat("en-US", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+	}).format(date);
+
+export const formatRelativeDate = (date: DateInput, now: Date = new Date()) => {
+	const parsedDate = new Date(date);
+
+	if (Number.isNaN(parsedDate.getTime())) {
+		return "";
+	}
+
+	const diffInSeconds = Math.max(
+		0,
+		Math.floor((now.getTime() - parsedDate.getTime()) / 1000),
+	);
+	const dateStart = getStartOfDay(parsedDate);
+	const nowStart = getStartOfDay(now);
+	const diffInDays = Math.floor(
+		(nowStart.getTime() - dateStart.getTime()) / (secondsInDay * 1000),
+	);
+
+	if (diffInDays === 0) {
+		if (diffInSeconds < secondsInMinute) {
+			return `${Math.max(diffInSeconds, 1)} sec ago`;
+		}
+
+		if (diffInSeconds < secondsInHour) {
+			return `${Math.floor(diffInSeconds / secondsInMinute)} min ago`;
+		}
+
+		return `${Math.floor(diffInSeconds / secondsInHour)} hour ago`;
+	}
+
+	if (diffInDays === 1) {
+		return "Yesterday";
+	}
+
+	if (diffInDays > 1 && diffInDays < 7) {
+		return `${diffInDays} days ago`;
+	}
+
+	return formatFullDate(parsedDate);
+};

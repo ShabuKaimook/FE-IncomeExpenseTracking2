@@ -3,8 +3,10 @@ import { toast } from "react-toastify";
 import { useUserExpenseTotal } from "@/features/transactions/hooks/useUserExpenseTotal";
 import { useUserIncomeTotal } from "@/features/transactions/hooks/useUserIncomeTotal";
 import { useUserTransactions } from "@/features/transactions/hooks/useUserTransactions";
-import { getThisMonthRange } from "@/shared/utils/date";
-import { formatRelativeDate } from "@/shared/utils/FormatDate";
+import {
+	formatRelativeDate,
+	getCurrentMonthDateRange,
+} from "@/shared/utils/date";
 import ExpenseCategorySummaryDashboard from "./components/ExpenseCategorySummaryDashboard";
 import IncomeExpenseDashboardCard from "./components/IncomeExpenseDashboardCard";
 import NetBalanceDashboardCard from "./components/NetBalanceDashboardCard";
@@ -13,7 +15,7 @@ import { SpendingTrendDashboardCard } from "./components/SpendingTrendDashboardC
 import { TransactionHistoryDashboardCard } from "./components/TransactionHistoryDashboardCard";
 
 export default function DashboardPage() {
-	const thisMonthRange = getThisMonthRange();
+	const thisMonthRange = getCurrentMonthDateRange();
 	const thisMonthCriteria = {
 		start_date: thisMonthRange.startDate,
 		end_date: thisMonthRange.endDate,

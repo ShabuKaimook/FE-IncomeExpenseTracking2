@@ -20,7 +20,7 @@ import { CustomSegmentedControl } from "@/shared/components/CustomSegmentedContr
 import { DateRangeWithShowDisabledNavigation } from "@/shared/components/DatePicker";
 import { DropDown } from "@/shared/components/DropDown";
 import { TRANSACTION_TYPE } from "@/shared/constants/TransactionTypeEnum";
-import { fromDateOnly, toDateOnly } from "@/shared/utils/date";
+import { dateToString, stringToDate } from "@/shared/utils/date";
 import { cn } from "@/shared/utils/Utils";
 import { TransactionCreateHeader } from "./components/TransactionCreateHeader";
 import { TransactionCreateImagePreview } from "./components/TransactionCreateImagePreview";
@@ -37,7 +37,7 @@ const emptyForm = (): FormState => ({
 	amount: "",
 	currencyCode: "THB",
 	description: "",
-	date: toDateOnly(new Date()),
+	date: dateToString(new Date()),
 	userTransactionCategoryId: "",
 });
 
@@ -334,10 +334,10 @@ export default function TransactionCreatePage() {
 								</div>
 								<DateRangeWithShowDisabledNavigation
 									mode="single"
-									value={form.date ? fromDateOnly(form.date) : new Date()}
+									value={form.date ? stringToDate(form.date) : new Date()}
 									onChange={(date) => {
 										if (date) {
-											updateForm("date", toDateOnly(date));
+											updateForm("date", dateToString(date));
 										}
 									}}
 									className="h-11 w-full sm:w-full"

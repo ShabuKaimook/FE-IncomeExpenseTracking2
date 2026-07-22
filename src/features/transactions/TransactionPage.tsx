@@ -5,10 +5,10 @@ import {
 } from "@/shared/components/DatePicker";
 import { SearchBar } from "@/shared/components/SearchBar";
 import {
-	fromMonthValue,
-	getThisMonthDateRange,
-	toDateOnly,
-	toMonthValue,
+	dateToString,
+	dateToYearMonthString,
+	getMonthDateRange,
+	yearMonthStringToDate,
 } from "@/shared/utils/date";
 import NewTransactionButton from "./components/NewTransactionButton";
 import type { TransactionFilterValue } from "./components/TransactionFilterDropdown";
@@ -41,8 +41,10 @@ const getAmountRangeCriteria = (filters: TransactionFilterValue) => {
 };
 
 export default function TransactionPage() {
-	const initialRange = getThisMonthDateRange(new Date());
-	const [selectedMonth, setSelectedMonth] = useState(toMonthValue(new Date()));
+	const initialRange = getMonthDateRange(new Date());
+	const [selectedMonth, setSelectedMonth] = useState(
+		dateToYearMonthString(new Date()),
+	);
 	const [dateRange, setDateRange] = useState<DatePickerRange>({
 		mode: "month",
 		startDate: initialRange.startDate,
@@ -69,9 +71,11 @@ export default function TransactionPage() {
 				: {}),
 			...(amountRange ? { amount_range: amountRange } : {}),
 			...(dateRange.startDate
-				? { start_date: toDateOnly(dateRange.startDate) }
+				? { start_date: dateToString(dateRange.startDate) }
 				: {}),
-			...(dateRange.endDate ? { end_date: toDateOnly(dateRange.endDate) } : {}),
+			...(dateRange.endDate
+				? { end_date: dateToString(dateRange.endDate) }
+				: {}),
 		};
 	}, [dateRange.endDate, dateRange.startDate, filters, search]);
 
@@ -80,10 +84,10 @@ export default function TransactionPage() {
 			<section className="z-30 rounded-xl">
 				<div className="flex flex-col gap-3 sm:flex-row lg:items-center lg:justify-between">
 					<DateRangeWithShowDisabledNavigation
-						value={fromMonthValue(selectedMonth)}
+						value={yearMonthStringToDate(selectedMonth)}
 						onChange={(date) => {
 							if (date) {
-								setSelectedMonth(toMonthValue(date));
+								setSelectedMonth(dateToYearMonthString(date));
 							}
 						}}
 						onRangeChange={setDateRange}

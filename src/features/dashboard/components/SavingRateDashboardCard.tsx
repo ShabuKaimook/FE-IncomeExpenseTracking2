@@ -4,11 +4,14 @@ import { toast } from "react-toastify";
 import { useUserSavingRate } from "@/features/transactions/hooks/useUserSavingRate";
 import { DashboardCard } from "@/shared/components/DashboardCard";
 import { Skeleton } from "@/shared/components/Skeleton";
-import { getLastMonthRange, getThisMonthRange } from "@/shared/utils/date";
+import {
+	getCurrentMonthDateRange,
+	getPreviousMonthDateRange,
+} from "@/shared/utils/date";
 
 export const SavingRateDashboardCard = () => {
-	const thisMonthRange = getThisMonthRange();
-	const lastMonthRange = getLastMonthRange();
+	const thisMonthRange = getCurrentMonthDateRange();
+	const lastMonthRange = getPreviousMonthDateRange();
 
 	const {
 		savingRate,

@@ -11,8 +11,8 @@ import { DropdownMenu } from "@radix-ui/themes";
 import CustomSegmentedControl from "@/shared/components/CustomSegmentedControl";
 import {
 	getAllMonthShortNames,
-	getThisMonthDateRange,
-	getThisWeekDateRange,
+	getMonthDateRange,
+	getWeekDateRange,
 } from "@/shared/utils/date";
 
 type DatePickerMode = "month" | "custom" | "single";
@@ -82,11 +82,11 @@ const getInitialDateRange = (mode: DatePickerMode, value: Date | null) => {
 	}
 
 	if (mode === "month") {
-		return getThisMonthDateRange(value);
+		return getMonthDateRange(value);
 	}
 
 	if (mode === "custom") {
-		return getThisWeekDateRange(value);
+		return getWeekDateRange(value);
 	}
 
 	return {
@@ -120,7 +120,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 			return;
 		}
 
-		const monthRange = getThisMonthDateRange(value);
+		const monthRange = getMonthDateRange(value);
 		setStartDate(monthRange.startDate);
 		setEndDate(monthRange.endDate);
 	}, [datePickerMode, value]);
@@ -151,7 +151,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 		setDatePickerMode(mode);
 
 		if (mode === "month" && value) {
-			const monthRange = getThisMonthDateRange(value);
+			const monthRange = getMonthDateRange(value);
 			setStartDate(monthRange.startDate);
 			setEndDate(monthRange.endDate);
 			emitRangeChange("month", monthRange.startDate, monthRange.endDate);
@@ -168,7 +168,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 			return;
 		}
 
-		const weekRange = getThisWeekDateRange(new Date());
+		const weekRange = getWeekDateRange(new Date());
 		setStartDate(weekRange.startDate);
 		setEndDate(weekRange.endDate);
 		setVisibleMonth(weekRange.startDate);
@@ -179,7 +179,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 	const handleMonthChange = (date: Date | null) => {
 		if (!date) return;
 
-		const monthRange = getThisMonthDateRange(date);
+		const monthRange = getMonthDateRange(date);
 		setStartDate(monthRange.startDate);
 		setEndDate(monthRange.endDate);
 		onChange(monthRange.startDate);
