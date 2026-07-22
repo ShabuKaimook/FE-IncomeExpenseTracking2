@@ -44,8 +44,7 @@ const ExpenseCategorySummaryDashboard = () => {
 			rightSide={
 				!isLoading && (
 					<div className="flex items-center gap-2 text-xs lg:text-sm bg-primary/20 px-3 py-1 rounded-2xl">
-						{/* TODO: link the path */}
-						<Link to="/analytic" className="text-primary cursor-pointer">
+						<Link to="/transaction" className="text-primary cursor-pointer">
 							<span className="text-primary cursor-pointer">View More</span>
 						</Link>
 					</div>

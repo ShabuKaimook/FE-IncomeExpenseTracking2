@@ -32,17 +32,21 @@ interface BarChartProps<T extends Record<string, unknown>> {
 }
 
 interface BarLabelProps {
-	x: number;
-	y: number;
-	width: number;
-	value: unknown;
+	x?: string | number;
+	y?: string | number;
+	width?: string | number;
+	value?: unknown;
 }
 
 const renderCustomBarLabel = ({ x, y, width, value }: BarLabelProps) => {
+	const labelX = Number(x ?? 0);
+	const labelY = Number(y ?? 0);
+	const labelWidth = Number(width ?? 0);
+
 	return (
 		<text
-			x={x + width / 2}
-			y={y}
+			x={labelX + labelWidth / 2}
+			y={labelY}
 			fill="var(--muted-foreground)"
 			textAnchor="middle"
 			dy={-6}
