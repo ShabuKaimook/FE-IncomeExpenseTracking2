@@ -22,4 +22,5 @@ export const transactionKeys = {
 		[...transactionKeys.all, "expense-summary", req] as const,
 	savingRate: (req: GetUserSavingRateRequest) =>
 		[...transactionKeys.all, "saving-rate", req] as const,
+	lastUpdated: () => [...transactionKeys.all, "last-updated"] as const,
 };

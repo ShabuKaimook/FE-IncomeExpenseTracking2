@@ -47,3 +47,7 @@ export interface TransactionDraftResponse {
 		lines: string[];
 	};
 }
+
+export interface TransactionLastUpdatedResponse {
+	last_updated: string | null;
+}
