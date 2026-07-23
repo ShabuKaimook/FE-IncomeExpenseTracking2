@@ -42,6 +42,7 @@ const mapTransaction = (transaction: {
 	transaction_type_id: number;
 	transaction_type_name: string;
 	transaction_category_name: string;
+	user_transaction_category_id: string;
 	amount: number;
 	currency_code: string;
 	description: string;
@@ -53,6 +54,7 @@ const mapTransaction = (transaction: {
 	amount: transaction.amount,
 	currency: transaction.currency_code,
 	category: transaction.transaction_category_name,
+	userTransactionCategoryId: transaction.user_transaction_category_id,
 	type_id:
 		transaction.transaction_type_id === TRANSACTION_TYPE.INCOME.id
 			? TRANSACTION_TYPE.INCOME.id

@@ -7,6 +7,7 @@ import type {
   GetUserExpenseTotalRequest,
   GetUserIncomeTotalRequest,
   GetUserSavingRateRequest,
+  UpdateTransactionRequest,
 } from "./TransactionRequest";
 import type {
   GetTransactionGroupByResponse,
@@ -22,6 +23,17 @@ const TRANSACTION_PREFIX = "/transaction";
 export const TransactionService = {
   createTransaction: async (body: CreateTransactionRequest): Promise<void> => {
     await axiosInstance.post(`${TRANSACTION_PREFIX}/create`, body);
+  },
+
+  updateTransaction: async (
+    transactionId: string,
+    body: UpdateTransactionRequest,
+  ): Promise<void> => {
+    await axiosInstance.patch(`${TRANSACTION_PREFIX}/${transactionId}`, body);
+  },
+
+  deleteTransaction: async (transactionId: string): Promise<void> => {
+    await axiosInstance.delete(`${TRANSACTION_PREFIX}/${transactionId}`);
   },
 
   createTransactionDraftFromImage: async (

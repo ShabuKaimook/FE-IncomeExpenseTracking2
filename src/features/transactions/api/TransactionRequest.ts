@@ -9,6 +9,8 @@ export interface CreateTransactionRequest {
 	date: string;
 }
 
+export type UpdateTransactionRequest = Partial<CreateTransactionRequest>;
+
 export interface GetTransactionRequest {
 	criteria?: {
 		description?: string;

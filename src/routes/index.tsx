@@ -1,6 +1,7 @@
 import { createRoute } from "@tanstack/react-router";
 import AuthCallbackPage from "@/features/auth/AuthCallbackPage";
 import LoginPage from "@/features/auth/LoginPage";
+import { RedirectIfAuthenticated } from "@/features/auth/RedirectIfAuthenticated";
 import { RequireAuth } from "@/features/auth/RequireAuth";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import TransactionCreatePage from "@/features/transactions/create/TransactionCreatePage";
@@ -40,7 +41,11 @@ const transactionCreateRoute = createRoute({
 const loginRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/login",
-	component: LoginPage,
+	component: () => (
+		<RedirectIfAuthenticated>
+			<LoginPage />
+		</RedirectIfAuthenticated>
+	),
 });
 
 const authCallbackRoute = createRoute({

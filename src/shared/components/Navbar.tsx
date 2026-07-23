@@ -1,6 +1,4 @@
-// Navbar.tsx
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LogIn } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { Sidebar } from "@/shared/components/Sidebar";
@@ -86,13 +84,7 @@ const Navbar = ({ navbarHeight }: NavbarProps) => {
 							<span>{user?.displayName}</span>
 						</div>
 					) : (
-						<Link
-							to="/login"
-							className="inline-flex size-9 items-center justify-center rounded-lg border border-(--line) bg-(--surface) text-foreground"
-							aria-label="Sign in"
-						>
-							<LogIn size={17} />
-						</Link>
+						null
 					)}
 
 					<Sidebar />

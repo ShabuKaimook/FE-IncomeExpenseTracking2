@@ -20,6 +20,7 @@ const mapTransaction = (transaction: TransactionResponse): Transaction => {
     amount: transaction.amount,
     currency: transaction.currency_code,
     category: transaction.transaction_category_name,
+    userTransactionCategoryId: transaction.user_transaction_category_id,
     type_id: isIncome
       ? TRANSACTION_TYPE.INCOME.id
       : TRANSACTION_TYPE.EXPENSE.id,

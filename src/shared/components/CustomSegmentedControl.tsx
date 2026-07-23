@@ -13,6 +13,7 @@ interface CustomSegmentedControlProps<TValue extends string> {
 	className?: string;
 	itemClassName?: string;
 	ariaLabel?: string;
+	disabled?: boolean;
 }
 
 const segmentedControlRootClassName = [
@@ -49,13 +50,19 @@ export function CustomSegmentedControl<TValue extends string>({
 	className,
 	itemClassName,
 	ariaLabel,
+	disabled = false,
 }: CustomSegmentedControlProps<TValue>) {
 	const optionValues = new Set(options.map((option) => option.value));
 
 	return (
 		<SegmentedControl.Root
 			aria-label={ariaLabel}
-			className={cn(segmentedControlRootClassName, className)}
+			aria-disabled={disabled}
+			className={cn(
+				segmentedControlRootClassName,
+				disabled && "pointer-events-none opacity-60",
+				className,
+			)}
 			value={value}
 			onValueChange={(nextValue) => {
 				if (optionValues.has(nextValue as TValue)) {

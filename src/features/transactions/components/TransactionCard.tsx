@@ -1,5 +1,10 @@
+import { useNavigate } from "@tanstack/react-router";
+import { Ellipsis, Pencil, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+import { DropDown } from "@/shared/components/DropDown";
 import { TRANSACTION_TYPE } from "@/shared/constants/TransactionTypeEnum";
 import { formatMoney } from "@/shared/utils/FormatMoney";
+import { useDeleteTransaction } from "../hooks/useDeleteTransaction";
 
 type TransactionTypeId =
 	(typeof TRANSACTION_TYPE)[keyof typeof TRANSACTION_TYPE]["id"];
@@ -13,12 +18,14 @@ export interface Transaction {
 	amount: number;
 	currency: string;
 	category: string;
+	userTransactionCategoryId: string;
 	type_id: TransactionTypeId;
 	type_name: TransactionTypeName | string;
 }
 
 interface TransactionCardProps {
 	transactions: Transaction[];
+	onEditTransaction?: (transaction: Transaction) => void;
 }
 
 const formatAmount = (transaction: Transaction) => {
@@ -28,7 +35,42 @@ const formatAmount = (transaction: Transaction) => {
 	)}`;
 };
 
-export const TransactionCard = ({ transactions }: TransactionCardProps) => {
+export const TransactionCard = ({
+	transactions,
+	onEditTransaction,
+}: TransactionCardProps) => {
+	const navigate = useNavigate();
+	const deleteTransaction = useDeleteTransaction();
+
+	const handleEditTransaction = (transaction: Transaction) => {
+		if (onEditTransaction) {
+			onEditTransaction(transaction);
+			return;
+		}
+
+		sessionStorage.setItem(
+			`transaction-edit:${transaction.id}`,
+			JSON.stringify(transaction),
+		);
+		navigate({
+			to: "/transaction/create",
+			search: {
+				edit_transaction_id: transaction.id,
+			},
+		});
+	};
+
+	const handleDeleteTransaction = (transaction: Transaction) => {
+		deleteTransaction.mutate(transaction.id, {
+			onSuccess: () => {
+				toast.success("Transaction deleted.");
+			},
+			onError: () => {
+				toast.error("Unable to delete transaction.");
+			},
+		});
+	};
+
 	return (
 		<>
 			{transactions.length === 0 ? (
@@ -51,6 +93,41 @@ export const TransactionCard = ({ transactions }: TransactionCardProps) => {
 									isIncome ? "border-primary/20" : "border-destructive/20"
 								}`}
 							>
+								<DropDown
+									triggerAriaLabel="Open transaction actions"
+									triggerClassName="absolute right-2 top-2 z-10 min-h-8 size-8 justify-center rounded-full border-none !bg-transparent p-0 hover:!bg-primary/10 focus:!border-none focus:!ring-0 focus:!ring-offset-0 group-hover:flex cursor-pointer"
+									contentClassName="w-44"
+									isShowTriggerLabel={false}
+									sections={[
+										{
+											sectionType: "static",
+											items: [
+												{
+													icon: Pencil,
+													title: "Edit",
+													value: "edit",
+												},
+												{
+													icon: Trash2,
+													title: "Delete",
+													value: "delete",
+													disabled: deleteTransaction.isPending,
+												},
+											],
+										},
+									]}
+									onItemSelect={({ item }) => {
+										if (item.value === "edit") {
+											handleEditTransaction(transaction);
+										}
+
+										if (item.value === "delete") {
+											handleDeleteTransaction(transaction);
+										}
+									}}
+								>
+									<Ellipsis size={17} className="text-muted-foreground" />
+								</DropDown>
 								<span
 									className={`absolute inset-y-0 left-0 w-1 ${
 										isIncome ? "bg-primary" : "bg-destructive"
