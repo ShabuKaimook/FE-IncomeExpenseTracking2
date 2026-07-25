@@ -8,7 +8,7 @@ export type CustomSegmentedControlOption<TValue extends string> = {
 
 interface CustomSegmentedControlProps<TValue extends string> {
 	value: TValue;
-	options: CustomSegmentedControlOption<TValue>[];
+	options: readonly CustomSegmentedControlOption<TValue>[];
 	onValueChange: (value: TValue) => void;
 	className?: string;
 	itemClassName?: string;

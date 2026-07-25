@@ -53,7 +53,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   shellComponent: RootDocument,
 });
 
-const NAVBAR_HEIGHT = 72;
+export const NAVBAR_HEIGHT = 72;
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (

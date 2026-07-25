@@ -6,6 +6,7 @@ import { RequireAuth } from "@/features/auth/RequireAuth";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import TransactionCreatePage from "@/features/transactions/create/TransactionCreatePage";
 import TransactionPage from "@/features/transactions/TransactionPage";
+import CategoryPage from "@/features/userTransactionCategories/CategoryPage";
 import { Route as rootRoute } from "./__root";
 
 const dashboardRoute = createRoute({
@@ -38,6 +39,16 @@ const transactionCreateRoute = createRoute({
 	),
 });
 
+const categoryRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/category",
+	component: () => (
+		<RequireAuth>
+			<CategoryPage />
+		</RequireAuth>
+	),
+});
+
 const loginRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/login",
@@ -64,6 +75,7 @@ export const routeTree = rootRoute.addChildren([
 	dashboardRoute,
 	transactionRoute,
 	transactionCreateRoute,
+	categoryRoute,
 	loginRoute,
 	authCallbackRoute,
 	lineAuthCallbackRoute,

@@ -11,7 +11,7 @@ export const useCreateUserTransactionCategory = () => {
 			UserTransactionCategoryService.createUserTransactionCategory(body),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: userTransactionCategoryKeys.lists(),
+				queryKey: userTransactionCategoryKeys.all,
 			});
 		},
 	});

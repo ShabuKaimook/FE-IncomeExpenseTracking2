@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { transactionKeys } from "@/features/transactions/api/TransactionQueryKeys";
+import { userTransactionCategoryKeys } from "@/features/userTransactionCategories/api/UserTransactionCategoryQueryKeys";
 import type { UpdateTransactionRequest } from "@/features/transactions/api/TransactionRequest";
 import { TransactionService } from "@/features/transactions/api/TransactionService";
 
@@ -17,6 +18,9 @@ export const useUpdateTransaction = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: transactionKeys.all,
+			});
+			queryClient.invalidateQueries({
+				queryKey: userTransactionCategoryKeys.all,
 			});
 		},
 	});

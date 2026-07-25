@@ -105,6 +105,10 @@ function getPageTitle(pathname: string) {
 		return "Transaction";
 	}
 
+	if (pathname.startsWith("/category")) {
+		return "Category";
+	}
+
 	if (pathname.startsWith("/login")) {
 		return "Login";
 	}

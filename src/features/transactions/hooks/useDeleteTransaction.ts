@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { transactionKeys } from "@/features/transactions/api/TransactionQueryKeys";
+import { userTransactionCategoryKeys } from "@/features/userTransactionCategories/api/UserTransactionCategoryQueryKeys";
 import { TransactionService } from "@/features/transactions/api/TransactionService";
 
 export const useDeleteTransaction = () => {
@@ -11,6 +12,9 @@ export const useDeleteTransaction = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: transactionKeys.all,
+			});
+			queryClient.invalidateQueries({
+				queryKey: userTransactionCategoryKeys.all,
 			});
 		},
 	});

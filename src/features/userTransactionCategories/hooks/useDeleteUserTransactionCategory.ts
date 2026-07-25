@@ -11,7 +11,7 @@ export const useDeleteUserTransactionCategory = () => {
 			UserTransactionCategoryService.deleteUserTransactionCategory(body),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: userTransactionCategoryKeys.lists(),
+				queryKey: userTransactionCategoryKeys.all,
 			});
 		},
 	});
