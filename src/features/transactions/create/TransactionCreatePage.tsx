@@ -80,6 +80,8 @@ const fieldClassName =
 const labelClassName = "text-xs font-bold uppercase text-muted-foreground";
 const fieldHeaderClassName = "flex items-baseline justify-between gap-3";
 const messageClassName = "text-right text-xs font-semibold text-destructive";
+const MAX_OCR_IMAGE_BYTES = 1_000_000;
+const OCR_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export default function TransactionCreatePage() {
   const navigate = useNavigate();
@@ -155,26 +157,45 @@ export default function TransactionCreatePage() {
     }));
   };
 
-  const handleImageChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-    const file = event.target.files?.[0] ?? null;
-    setSelectedImage(file);
-
+  const clearImage = () => {
     if (imagePreviewUrl) {
       URL.revokeObjectURL(imagePreviewUrl);
     }
 
-    setImagePreviewUrl(file ? URL.createObjectURL(file) : null);
-  };
-
-  const handleClearImage = () => {
     setSelectedImage(null);
-
-    if (imagePreviewUrl) {
-      URL.revokeObjectURL(imagePreviewUrl);
-    }
-
     setImagePreviewUrl(null);
   };
+
+  const handleImageChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    const file = event.target.files?.[0] ?? null;
+    if (!file) {
+      clearImage();
+      return;
+    }
+
+    if (!OCR_IMAGE_TYPES.has(file.type)) {
+      event.currentTarget.value = "";
+      clearImage();
+      toast.error("Use a PNG, JPG, or WebP receipt image.");
+      return;
+    }
+
+    if (file.size > MAX_OCR_IMAGE_BYTES) {
+      event.currentTarget.value = "";
+      clearImage();
+      toast.error("Receipt image must be 1 MB or smaller.");
+      return;
+    }
+
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    setSelectedImage(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleClearImage = clearImage;
 
   const handleScanImage = () => {
     if (!selectedImage) {

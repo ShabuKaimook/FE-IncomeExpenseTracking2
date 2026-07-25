@@ -52,7 +52,7 @@ export const TransactionCreateImagePreview = ({
 								Choose receipt image
 							</p>
 							<p className="text-xs text-muted-foreground">
-								PNG, JPG, or image from camera roll
+								PNG, JPG, or WebP up to 1 MB
 							</p>
 						</div>
 					</>
@@ -61,7 +61,7 @@ export const TransactionCreateImagePreview = ({
 			<input
 				id="transaction-image"
 				type="file"
-				accept="image/*"
+				accept="image/jpeg,image/png,image/webp"
 				className="sr-only"
 				onChange={onImageChange}
 			/>
