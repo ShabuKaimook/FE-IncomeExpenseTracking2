@@ -43,15 +43,34 @@ const emptyForm = (): FormState => ({
   userTransactionCategoryId: "",
 });
 
+const getInitialForm = (): FormState => {
+  const form = emptyForm();
+  if (typeof window === "undefined") return form;
+
+  const params = new URLSearchParams(window.location.search);
+  return {
+    amount: params.get("amount") ?? form.amount,
+    currencyCode: params.get("currency_code") === "USD" ? "USD" : "THB",
+    description: params.get("description") ?? form.description,
+    date: params.get("date") || form.date,
+    userTransactionCategoryId:
+      params.get("user_transaction_category_id") ??
+      form.userTransactionCategoryId,
+  };
+};
+
 const getInitialMode = () =>
   typeof window === "undefined"
     ? "manual"
-    : (new URLSearchParams(window.location.search).get("mode") ?? "manual");
+    : new URLSearchParams(window.location.search).get("mode") === "image"
+      ? "image"
+      : "manual";
 
 const getEditTransactionId = () =>
   typeof window === "undefined"
     ? null
-    : new URLSearchParams(window.location.search).get("edit_transaction_id");
+    : (new URLSearchParams(window.location.search).get("edit_transaction_id") ??
+      new URLSearchParams(window.location.search).get("transaction_id"));
 
 const getStoredEditTransaction = (
   transactionId: string | null,
@@ -86,7 +105,7 @@ const OCR_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 export default function TransactionCreatePage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState(getInitialMode);
-  const [form, setForm] = useState<FormState>(emptyForm);
+  const [form, setForm] = useState<FormState>(getInitialForm);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [editTransactionId] = useState(getEditTransactionId);

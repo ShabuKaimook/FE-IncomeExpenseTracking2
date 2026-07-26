@@ -93,7 +93,6 @@ export default function CategoryPage() {
   const { categories, isLoading } = useUserTransactionCategoryAmounts(request);
   const selectedSortTitle =
     sortOptions.find((option) => option.value === sortBy)?.title ?? "None";
-  const isIncome = transactionType === "income";
 
   const handleCreate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -77,7 +77,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   <div className="frame">{children}</div>
                 </main>
 
-                {/* background */}
                 <div
                   aria-hidden
                   className="pointer-events-none fixed inset-0 -z-2 overflow-hidden"
