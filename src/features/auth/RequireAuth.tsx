@@ -15,6 +15,12 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 	}
 
 	if (!isAuthenticated) {
+		if (typeof window !== "undefined") {
+			window.sessionStorage.setItem(
+				"auth-return-to",
+				`${window.location.pathname}${window.location.search}`,
+			);
+		}
 		return <Navigate to="/login" />;
 	}
 

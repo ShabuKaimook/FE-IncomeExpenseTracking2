@@ -26,7 +26,13 @@ export default function AuthCallbackPage() {
 		AuthService.signInWithLine(code, callbackUrl.origin + callbackUrl.pathname)
 			.then((response) => {
 				completeLogin(response.accessToken, response.user);
-				navigate({ to: "/" });
+				const returnTo = window.sessionStorage.getItem("auth-return-to");
+				window.sessionStorage.removeItem("auth-return-to");
+				navigate({
+					to: returnTo?.startsWith("/") && !returnTo.startsWith("//")
+						? returnTo
+						: "/",
+				});
 			})
 			.catch(() => {
 				setMessage("Unable to complete LINE login.");
