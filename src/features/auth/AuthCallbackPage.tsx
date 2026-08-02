@@ -1,11 +1,9 @@
-import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { AuthService } from "./api/AuthService";
 import { useAuth } from "./AuthProvider";
 
 export default function AuthCallbackPage() {
-	const navigate = useNavigate();
 	const { completeLogin } = useAuth();
 	const [message, setMessage] = useState("Signing you in...");
 
@@ -28,17 +26,15 @@ export default function AuthCallbackPage() {
 				completeLogin(response.accessToken, response.user);
 				const returnTo = window.sessionStorage.getItem("auth-return-to");
 				window.sessionStorage.removeItem("auth-return-to");
-				navigate({
-					to: returnTo?.startsWith("/") && !returnTo.startsWith("//")
-						? returnTo
-						: "/",
-				});
+				window.location.replace(
+					returnTo?.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/",
+				);
 			})
 			.catch(() => {
 				setMessage("Unable to complete LINE login.");
 				toast.error("Unable to complete LINE login.");
 			});
-	}, [completeLogin, navigate]);
+	}, [completeLogin]);
 
 	return (
 		<div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground">
