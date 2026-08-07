@@ -30,3 +30,19 @@ export interface GetUserTransactionCategoryAmountsRequest {
 		direction: "asc" | "desc";
 	};
 }
+
+export interface CategoryTrendRequest {
+	user_transaction_category_id: string;
+	start_date: string;
+	end_date: string;
+}
+
+export interface AverageTransactionSizeRequest {
+	start_date: string;
+	end_date: string;
+	user_transaction_category_ids?: string[];
+	amount_range?: {
+		range_start: number;
+		range_end: number;
+	};
+}

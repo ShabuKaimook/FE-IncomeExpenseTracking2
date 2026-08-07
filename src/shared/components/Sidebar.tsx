@@ -1,7 +1,7 @@
-import { useAuth } from "@/features/auth/AuthProvider";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
 	BarChart3,
+	Calculator,
 	ChevronUp,
 	Home,
 	LogOut,
@@ -10,6 +10,7 @@ import {
 	Settings,
 	Tags,
 } from "lucide-react";
+import { useAuth } from "@/features/auth/AuthProvider";
 import { DropDown } from "./DropDown";
 
 interface NavItem {
@@ -22,7 +23,8 @@ const navItems: NavItem[] = [
 	{ label: "Home", to: "/", icon: Home },
 	{ label: "Transaction", to: "/transaction", icon: Receipt },
 	{ label: "Category", to: "/category", icon: Tags },
-	{ label: "Analytic", to: "/analytic", icon: BarChart3 },
+	{ label: "Analysis", to: "/analysis", icon: BarChart3 },
+	{ label: "Tax", to: "/tax", icon: Calculator },
 	{ label: "Setting", to: "/setting", icon: Settings },
 ];
 

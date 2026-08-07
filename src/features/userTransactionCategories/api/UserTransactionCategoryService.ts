@@ -1,5 +1,7 @@
 import { axiosInstance } from "@/shared/api/AxiosInstance";
 import type {
+	AverageTransactionSizeRequest,
+	CategoryTrendRequest,
 	CreateUserTransactionCategoryRequest,
 	DeleteUserTransactionCategoryRequest,
 	GetUserTransactionCategoryAmountsRequest,
@@ -7,6 +9,8 @@ import type {
 	UpdateUserTransactionCategoryRequest,
 } from "./UserTransactionCategoryRequest";
 import type {
+	AverageTransactionSizeResponse,
+	CategoryTrendResponse,
 	GetTransactionCategorySummaryResponse,
 	UserTransactionCategoryAmountResponse,
 	UserTransactionCategoryResponse,
@@ -39,6 +43,28 @@ export const UserTransactionCategoryService = {
 		const response = await axiosInstance.post<
 			GetTransactionCategorySummaryResponse[]
 		>("/user-transaction-category/summary", req);
+
+		return response.data;
+	},
+
+	getCategoryTrend: async (
+		req: CategoryTrendRequest,
+	): Promise<CategoryTrendResponse[]> => {
+		const response = await axiosInstance.post<CategoryTrendResponse[]>(
+			"/user-transaction-category/trend",
+			req,
+		);
+
+		return response.data;
+	},
+
+	getAverageTransactionSize: async (
+		req: AverageTransactionSizeRequest,
+	): Promise<AverageTransactionSizeResponse[]> => {
+		const response = await axiosInstance.post<AverageTransactionSizeResponse[]>(
+			"/user-transaction-category/avg-transaction-size",
+			req,
+		);
 
 		return response.data;
 	},

@@ -23,3 +23,17 @@ export interface UserTransactionCategoryAmountResponse {
 	is_editable: boolean;
 	amount: number;
 }
+
+export interface CategoryTrendResponse {
+	month: string;
+	user_transaction_category_id: string;
+	transaction_category_name: string;
+	total_amount: number;
+}
+
+export interface AverageTransactionSizeResponse {
+	user_transaction_category_id: string;
+	transaction_category_name: string;
+	avg_amount: number;
+	transaction_count: number;
+}

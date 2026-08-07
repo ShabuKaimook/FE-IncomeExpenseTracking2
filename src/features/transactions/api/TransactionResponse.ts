@@ -51,3 +51,21 @@ export interface TransactionDraftResponse {
 export interface TransactionLastUpdatedResponse {
 	last_updated: string | null;
 }
+
+export interface SpendingHeatmapResponse {
+	date: string;
+	day_of_week: number;
+	total_spent: number;
+}
+
+export interface FixedVsVariableResponse {
+	fixed_amount: number;
+	variable_amount: number;
+}
+
+export interface RecurringTransactionResponse {
+	description: string;
+	amount: number;
+	interval_days: number;
+	last_seen: string;
+}

@@ -84,3 +84,20 @@ export interface GetUserExpenseSummaryRequest {
 export interface GetUserSavingRateRequest {
 	periods: Period[];
 }
+
+export interface TransactionAnalysisFilterRequest {
+	start_date?: string;
+	end_date?: string;
+	user_transaction_category_ids?: string[];
+	amount_range?: {
+		range_start: number;
+		range_end: number;
+	};
+	description?: string;
+}
+
+export type SpendingHeatmapRequest = TransactionAnalysisFilterRequest;
+
+export type FixedVsVariableRequest = TransactionAnalysisFilterRequest;
+
+export type RecurringTransactionsRequest = TransactionAnalysisFilterRequest;

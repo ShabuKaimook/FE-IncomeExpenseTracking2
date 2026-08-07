@@ -1,9 +1,11 @@
 import { createRoute } from "@tanstack/react-router";
+import AnalysisPage from "@/features/analysis/AnalysisPage";
 import AuthCallbackPage from "@/features/auth/AuthCallbackPage";
 import LoginPage from "@/features/auth/LoginPage";
 import { RedirectIfAuthenticated } from "@/features/auth/RedirectIfAuthenticated";
 import { RequireAuth } from "@/features/auth/RequireAuth";
 import DashboardPage from "@/features/dashboard/DashboardPage";
+import TaxPage from "@/features/tax/TaxPage";
 import TransactionCreatePage from "@/features/transactions/create/TransactionCreatePage";
 import TransactionPage from "@/features/transactions/TransactionPage";
 import CategoryPage from "@/features/userTransactionCategories/CategoryPage";
@@ -49,6 +51,26 @@ const categoryRoute = createRoute({
 	),
 });
 
+const analysisRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/analysis",
+	component: () => (
+		<RequireAuth>
+			<AnalysisPage />
+		</RequireAuth>
+	),
+});
+
+const taxRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/tax",
+	component: () => (
+		<RequireAuth>
+			<TaxPage />
+		</RequireAuth>
+	),
+});
+
 const loginRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/login",
@@ -76,6 +98,8 @@ export const routeTree = rootRoute.addChildren([
 	transactionRoute,
 	transactionCreateRoute,
 	categoryRoute,
+	analysisRoute,
+	taxRoute,
 	loginRoute,
 	authCallbackRoute,
 	lineAuthCallbackRoute,

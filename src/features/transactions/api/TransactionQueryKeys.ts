@@ -1,10 +1,13 @@
 import type {
+	FixedVsVariableRequest,
 	GetTransactionGroupByRequest,
 	GetTransactionRequest,
 	GetUserExpenseSummaryRequest,
 	GetUserExpenseTotalRequest,
 	GetUserIncomeTotalRequest,
 	GetUserSavingRateRequest,
+	RecurringTransactionsRequest,
+	SpendingHeatmapRequest,
 } from "@/features/transactions/api/TransactionRequest";
 
 export const transactionKeys = {
@@ -22,5 +25,11 @@ export const transactionKeys = {
 		[...transactionKeys.all, "expense-summary", req] as const,
 	savingRate: (req: GetUserSavingRateRequest) =>
 		[...transactionKeys.all, "saving-rate", req] as const,
+	spendingHeatmap: (req: SpendingHeatmapRequest) =>
+		[...transactionKeys.all, "spending-heatmap", req] as const,
+	fixedVsVariable: (req: FixedVsVariableRequest) =>
+		[...transactionKeys.all, "fixed-vs-variable", req] as const,
+	recurring: (req: RecurringTransactionsRequest) =>
+		[...transactionKeys.all, "recurring", req] as const,
 	lastUpdated: () => [...transactionKeys.all, "last-updated"] as const,
 };
