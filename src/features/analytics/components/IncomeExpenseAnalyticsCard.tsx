@@ -57,7 +57,7 @@ export function IncomeExpenseAnalyticsCard({
 			{view === "chart" ? (
 				isLoading ? (
 					<Skeleton
-						className="h-36 w-full"
+						className="h-25 w-full"
 						label="Loading income expense chart"
 					/>
 				) : (
@@ -66,9 +66,9 @@ export function IncomeExpenseAnalyticsCard({
 							{ name: "Income", value: incomeTotal },
 							{ name: "Expense", value: expenseTotal },
 						].filter((item) => item.value > 0)}
-						height={144}
-						innerRadius={34}
-						outerRadius={54}
+						height={100}
+						innerRadius={30}
+						outerRadius={60}
 						colors={["var(--primary)", "var(--destructive)"]}
 					/>
 				)

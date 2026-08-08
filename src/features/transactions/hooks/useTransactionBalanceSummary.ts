@@ -21,6 +21,7 @@ export const useTransactionBalanceSummary = (
 
 	return {
 		balanceSummary: data?.[0] ?? emptyBalanceSummary,
+		balanceSummaries: data ?? [],
 		error,
 		isLoading,
 	};

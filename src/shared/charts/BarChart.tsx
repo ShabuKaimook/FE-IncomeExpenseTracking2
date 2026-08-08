@@ -27,6 +27,9 @@ interface BarChartProps<T extends Record<string, unknown>> {
 	showGrid?: boolean;
 	showLabels?: boolean;
 	showYAxis?: boolean;
+	valueFormatter?: (value: number) => string;
+	tooltipValueFormatter?: (value: number) => string;
+	legendVerticalAlign?: "top" | "bottom";
 	xAxisLabel?: string;
 	yAxisLabel?: string;
 }
@@ -36,12 +39,21 @@ interface BarLabelProps {
 	y?: string | number;
 	width?: string | number;
 	value?: unknown;
+	valueFormatter?: (value: number) => string;
 }
 
-const renderCustomBarLabel = ({ x, y, width, value }: BarLabelProps) => {
+const renderCustomBarLabel = ({
+	x,
+	y,
+	width,
+	value,
+	valueFormatter,
+}: BarLabelProps) => {
 	const labelX = Number(x ?? 0);
 	const labelY = Number(y ?? 0);
 	const labelWidth = Number(width ?? 0);
+	const labelValue = Number(value);
+	const label = valueFormatter?.(labelValue) ?? `${value}`;
 
 	return (
 		<text
@@ -50,7 +62,9 @@ const renderCustomBarLabel = ({ x, y, width, value }: BarLabelProps) => {
 			fill="var(--muted-foreground)"
 			textAnchor="middle"
 			dy={-6}
-		>{`${value}`}</text>
+		>
+			{label}
+		</text>
 	);
 };
 
@@ -62,6 +76,9 @@ export function BarChart<T extends Record<string, unknown>>({
 	showGrid = false,
 	showYAxis = false,
 	showLabels = false,
+	valueFormatter,
+	tooltipValueFormatter,
+	legendVerticalAlign = "top",
 	xAxisLabel = "",
 	yAxisLabel = "",
 }: BarChartProps<T>) {
@@ -109,6 +126,9 @@ export function BarChart<T extends Record<string, unknown>>({
 					<YAxis
 						axisLine={false}
 						tickLine={false}
+						tickFormatter={(value) =>
+							valueFormatter ? valueFormatter(Number(value)) : value
+						}
 						label={{
 							value: yAxisLabel,
 							angle: -90,
@@ -118,8 +138,20 @@ export function BarChart<T extends Record<string, unknown>>({
 					/>
 				)}
 
-				<Tooltip cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-				{bars.length > 1 && <Legend verticalAlign="top" align="right" />}
+				<Tooltip
+					cursor={{ fill: "rgba(0,0,0,0.04)" }}
+					formatter={
+						tooltipValueFormatter
+							? (value, name) => [tooltipValueFormatter(Number(value)), name]
+							: undefined
+					}
+				/>
+				{bars.length > 1 && (
+					<Legend
+						verticalAlign={legendVerticalAlign}
+						align={legendVerticalAlign === "bottom" ? "center" : "right"}
+					/>
+				)}
 
 				<defs>
 					{bars.map((bar) => {
@@ -158,7 +190,12 @@ export function BarChart<T extends Record<string, unknown>>({
 									? `url(#${id}-${bar.dataKey}-gradient)`
 									: resolveColor(bar.color)
 							}
-							label={showLabels ? renderCustomBarLabel : undefined}
+							label={
+								showLabels
+									? (props) =>
+											renderCustomBarLabel({ ...props, valueFormatter })
+									: undefined
+							}
 							radius={[8, 8, 0, 0]}
 						/>
 					);

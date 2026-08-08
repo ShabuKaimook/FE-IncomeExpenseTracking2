@@ -35,6 +35,8 @@ export interface DatePickerProps {
 		value: DatePickerMode;
 	}[];
 	className?: string;
+	hideTriggerLabel?: boolean;
+	triggerIcon?: React.ReactNode;
 }
 
 // STYLES
@@ -129,6 +131,8 @@ export const DateRangeWithShowDisabledNavigation = ({
 	onRangeChange,
 	modeOptions,
 	className = "",
+	hideTriggerLabel = false,
+	triggerIcon,
 }: DatePickerProps) => {
 	const [datePickerMode, setDatePickerMode] = useState<DatePickerMode>(
 		mode ?? "month",
@@ -338,10 +342,14 @@ export const DateRangeWithShowDisabledNavigation = ({
 						type="button"
 						className={`flex h-10 w-full sm:w-45 cursor-pointer items-center gap-3 rounded-lg border border-(--line) bg-popover px-3 text-sm focus:outline-primary transition hover:border-primary/40 ${className}`}
 					>
-						<CalendarDays size={17} className="shrink-0 text-primary" />
-						<span className="truncate font-medium text-foreground">
-							{triggerLabel}
-						</span>
+						{triggerIcon ?? (
+							<CalendarDays size={17} className="shrink-0 text-primary" />
+						)}
+						{!hideTriggerLabel && (
+							<span className="truncate font-medium text-foreground">
+								{triggerLabel}
+							</span>
+						)}
 					</button>
 				</DropdownMenu.Trigger>
 
