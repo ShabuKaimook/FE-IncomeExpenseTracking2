@@ -10,6 +10,8 @@ import "@daypicker/react/style.css";
 import { DropdownMenu } from "@radix-ui/themes";
 import CustomSegmentedControl from "@/shared/components/CustomSegmentedControl";
 import {
+	formatShortDate,
+	formatShortDateRange,
 	getAllMonthShortNames,
 	getMonthDateRange,
 	getWeekDateRange,
@@ -55,7 +57,7 @@ const dayPickerClassNames = {
 	[SelectionState.range_middle]:
 		"[&>button]:rounded-none [&>button]:bg-primary/10 [&>button]:text-muted-foreground/80",
 	[SelectionState.range_end]:
-		"rounded-r-lg bg-primary/10 [&>button]:rounded-l-none [&>button]:rounded-r-lg [&>button]:bg-primary [&>button]:text-primary-foreground",
+		"rounded-r-lg bg-primary/10 [&>button]:rounded-l-none [&>button]:rounded-r-lg [&>button]:!bg-primary [&>button]:text-primary-foreground",
 	[UI.Chevron]:
 		"fill-popover text-(--sea-ink-soft) transition hover:text-(--sea-ink) size-4 [&>svg]:size-3 [&>svg]:stroke-(--sea-ink-soft) [&>svg]:transition [&>svg]:hover:stroke-(--sea-ink)",
 };
@@ -66,6 +68,15 @@ const dayPickerStyles = {
 		"--rdp-accent-background-color":
 			"color-mix(in oklab, var(--primary) 12%, transparent)",
 	} as CSSProperties,
+};
+
+const weekRangeModifierClassNames = {
+	week_range_start:
+		"rounded-lg bg-primary/10 [&>button]:rounded-l-lg [&>button]:rounded-r-none [&>button]:bg-primary [&>button]:text-primary-foreground",
+	week_range_middle:
+		"[&>button]:rounded-none [&>button]:bg-primary/10 [&>button]:text-muted-foreground/80",
+	week_range_end:
+		"rounded-r-lg bg-primary/10 [&>button]:rounded-l-none [&>button]:rounded-r-lg [&>button]:!bg-primary [&>button]:text-primary-foreground",
 };
 
 const datePickerModeOptions: {
@@ -103,6 +114,14 @@ const getInitialDateRange = (mode: DatePickerMode, value: Date | null) => {
 	};
 };
 
+const isSameDate = (leftDate: Date, rightDate: Date) =>
+	leftDate.getFullYear() === rightDate.getFullYear() &&
+	leftDate.getMonth() === rightDate.getMonth() &&
+	leftDate.getDate() === rightDate.getDate();
+
+const isBetweenDates = (date: Date, startDate: Date, endDate: Date) =>
+	date.getTime() > startDate.getTime() && date.getTime() < endDate.getTime();
+
 export const DateRangeWithShowDisabledNavigation = ({
 	mode,
 	value,
@@ -122,7 +141,16 @@ export const DateRangeWithShowDisabledNavigation = ({
 	const [endDate, setEndDate] = useState<Date | null>(initialDateRange.endDate);
 	const [isOpen, setIsOpen] = useState(false);
 	const [visibleMonth, setVisibleMonth] = useState(value ?? new Date());
+	const [hoveredWeekRange, setHoveredWeekRange] = useState<{
+		startDate: Date;
+		endDate: Date;
+	} | null>(null);
 	const visibleYear = visibleMonth.getFullYear();
+	const weekRange =
+		datePickerMode === "week"
+			? (hoveredWeekRange ??
+				(startDate && endDate ? { startDate, endDate } : null))
+			: null;
 
 	useEffect(() => {
 		if (!value || datePickerMode !== "month") {
@@ -158,6 +186,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 
 	const handleModeChange = (mode: DatePickerMode) => {
 		setDatePickerMode(mode);
+		setHoveredWeekRange(null);
 
 		if (mode === "month" && value) {
 			const monthRange = getMonthDateRange(value);
@@ -240,7 +269,18 @@ export const DateRangeWithShowDisabledNavigation = ({
 		setVisibleMonth(weekRange.startDate);
 		onChange(weekRange.startDate);
 		emitRangeChange("week", weekRange.startDate, weekRange.endDate);
+		setHoveredWeekRange(null);
 		setIsOpen(false);
+	};
+
+	const handleWeekDayMouseEnter = (date: Date) => {
+		if (datePickerMode === "week") {
+			setHoveredWeekRange(getWeekDateRange(date));
+		}
+	};
+
+	const handleWeekDayMouseLeave = () => {
+		setHoveredWeekRange(null);
 	};
 
 	const goToPreviousYear = () => {
@@ -270,31 +310,13 @@ export const DateRangeWithShowDisabledNavigation = ({
 					year: "numeric",
 				}) ?? "Select month")
 			: datePickerMode === "week" && startDate && endDate
-				? `${startDate.toLocaleDateString("en-US", {
-						day: "numeric",
-						month: "short",
-						year: "numeric",
-					})} - ${endDate.toLocaleDateString("en-US", {
-						day: "numeric",
-						month: "short",
-						year: "numeric",
-					})}`
+				? formatShortDateRange(startDate, endDate)
 				: datePickerMode === "single"
-					? (startDate?.toLocaleDateString("en-US", {
-							day: "numeric",
-							month: "short",
-							year: "numeric",
-						}) ?? "Select date")
+					? startDate
+						? formatShortDate(startDate)
+						: "Select date"
 					: startDate && endDate
-						? `${startDate.toLocaleDateString("en-US", {
-								day: "numeric",
-								month: "short",
-								year: "numeric",
-							})} - ${endDate.toLocaleDateString("en-US", {
-								day: "numeric",
-								month: "short",
-								year: "numeric",
-							})}`
+						? formatShortDateRange(startDate, endDate)
 						: "Select date range";
 
 	return (
@@ -391,6 +413,33 @@ export const DateRangeWithShowDisabledNavigation = ({
 									onMonthChange={setVisibleMonth}
 									showOutsideDays
 									classNames={dayPickerClassNames}
+									modifiers={
+										weekRange
+											? {
+													week_range_start: (date) =>
+														isSameDate(date, weekRange.startDate),
+													week_range_middle: (date) =>
+														isBetweenDates(
+															date,
+															weekRange.startDate,
+															weekRange.endDate,
+														),
+													week_range_end: (date) =>
+														isSameDate(date, weekRange.endDate),
+												}
+											: undefined
+									}
+									modifiersClassNames={weekRangeModifierClassNames}
+									onDayMouseEnter={
+										datePickerMode === "week"
+											? handleWeekDayMouseEnter
+											: undefined
+									}
+									onDayMouseLeave={
+										datePickerMode === "week"
+											? handleWeekDayMouseLeave
+											: undefined
+									}
 									styles={dayPickerStyles}
 								/>
 							</div>
