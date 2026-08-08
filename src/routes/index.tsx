@@ -1,4 +1,5 @@
 import { createRoute } from "@tanstack/react-router";
+import AnalyticsPage from "@/features/analytics/AnalyticsPage";
 import AuthCallbackPage from "@/features/auth/AuthCallbackPage";
 import LoginPage from "@/features/auth/LoginPage";
 import { RedirectIfAuthenticated } from "@/features/auth/RedirectIfAuthenticated";
@@ -49,6 +50,16 @@ const categoryRoute = createRoute({
 	),
 });
 
+const analyticRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/analytic",
+	component: () => (
+		<RequireAuth>
+			<AnalyticsPage />
+		</RequireAuth>
+	),
+});
+
 const loginRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/login",
@@ -76,6 +87,7 @@ export const routeTree = rootRoute.addChildren([
 	transactionRoute,
 	transactionCreateRoute,
 	categoryRoute,
+	analyticRoute,
 	loginRoute,
 	authCallbackRoute,
 	lineAuthCallbackRoute,

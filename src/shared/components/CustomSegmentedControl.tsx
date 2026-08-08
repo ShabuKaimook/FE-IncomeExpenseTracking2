@@ -1,8 +1,9 @@
 import { SegmentedControl } from "@radix-ui/themes";
+import type { ReactNode } from "react";
 import { cn } from "@/shared/utils/Utils";
 
 export type CustomSegmentedControlOption<TValue extends string> = {
-	label: string;
+	label: ReactNode;
 	value: TValue;
 };
 

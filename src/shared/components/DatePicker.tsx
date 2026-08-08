@@ -15,7 +15,7 @@ import {
 	getWeekDateRange,
 } from "@/shared/utils/date";
 
-type DatePickerMode = "month" | "custom" | "single";
+export type DatePickerMode = "month" | "week" | "custom" | "single";
 
 export type DatePickerRange = {
 	mode: DatePickerMode;
@@ -28,6 +28,10 @@ export interface DatePickerProps {
 	value: Date | null;
 	onChange: (date: Date | null) => void;
 	onRangeChange?: (range: DatePickerRange) => void;
+	modeOptions?: readonly {
+		label: string;
+		value: DatePickerMode;
+	}[];
 	className?: string;
 }
 
@@ -89,6 +93,10 @@ const getInitialDateRange = (mode: DatePickerMode, value: Date | null) => {
 		return getWeekDateRange(value);
 	}
 
+	if (mode === "week") {
+		return getWeekDateRange(value);
+	}
+
 	return {
 		startDate: value,
 		endDate: value,
@@ -100,6 +108,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 	value,
 	onChange,
 	onRangeChange,
+	modeOptions,
 	className = "",
 }: DatePickerProps) => {
 	const [datePickerMode, setDatePickerMode] = useState<DatePickerMode>(
@@ -158,6 +167,16 @@ export const DateRangeWithShowDisabledNavigation = ({
 			return;
 		}
 
+		if (mode === "week") {
+			const weekRange = getWeekDateRange(value ?? new Date());
+			setStartDate(weekRange.startDate);
+			setEndDate(weekRange.endDate);
+			setVisibleMonth(weekRange.startDate);
+			onChange(weekRange.startDate);
+			emitRangeChange("week", weekRange.startDate, weekRange.endDate);
+			return;
+		}
+
 		if (mode === "single") {
 			const selectedDate = value ?? new Date();
 			setStartDate(selectedDate);
@@ -212,6 +231,18 @@ export const DateRangeWithShowDisabledNavigation = ({
 		}
 	};
 
+	const handleWeekDateChange = (date: Date | undefined) => {
+		if (!date) return;
+
+		const weekRange = getWeekDateRange(date);
+		setStartDate(weekRange.startDate);
+		setEndDate(weekRange.endDate);
+		setVisibleMonth(weekRange.startDate);
+		onChange(weekRange.startDate);
+		emitRangeChange("week", weekRange.startDate, weekRange.endDate);
+		setIsOpen(false);
+	};
+
 	const goToPreviousYear = () => {
 		setVisibleMonth(
 			(currentMonth) =>
@@ -238,23 +269,33 @@ export const DateRangeWithShowDisabledNavigation = ({
 					month: "long",
 					year: "numeric",
 				}) ?? "Select month")
-			: datePickerMode === "single"
-				? (startDate?.toLocaleDateString("en-US", {
+			: datePickerMode === "week" && startDate && endDate
+				? `${startDate.toLocaleDateString("en-US", {
 						day: "numeric",
 						month: "short",
 						year: "numeric",
-					}) ?? "Select date")
-				: startDate && endDate
-					? `${startDate.toLocaleDateString("en-US", {
+					})} - ${endDate.toLocaleDateString("en-US", {
+						day: "numeric",
+						month: "short",
+						year: "numeric",
+					})}`
+				: datePickerMode === "single"
+					? (startDate?.toLocaleDateString("en-US", {
 							day: "numeric",
 							month: "short",
 							year: "numeric",
-						})} - ${endDate.toLocaleDateString("en-US", {
-							day: "numeric",
-							month: "short",
-							year: "numeric",
-						})}`
-					: "Select date range";
+						}) ?? "Select date")
+					: startDate && endDate
+						? `${startDate.toLocaleDateString("en-US", {
+								day: "numeric",
+								month: "short",
+								year: "numeric",
+							})} - ${endDate.toLocaleDateString("en-US", {
+								day: "numeric",
+								month: "short",
+								year: "numeric",
+							})}`
+						: "Select date range";
 
 	return (
 		<div className="flex flex-col sm:flex-row w-full items-center gap-2">
@@ -264,7 +305,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 					className="w-full sm:w-auto"
 					ariaLabel="Date picker mode"
 					value={datePickerMode}
-					options={datePickerModeOptions}
+					options={modeOptions ?? datePickerModeOptions}
 					onValueChange={handleModeChange}
 				/>
 			)}
@@ -333,7 +374,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 									})}
 								</div>
 							</div>
-						) : datePickerMode === "single" ? (
+						) : datePickerMode === "single" || datePickerMode === "week" ? (
 							<div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
 								<DayPicker
 									animate
@@ -341,7 +382,11 @@ export const DateRangeWithShowDisabledNavigation = ({
 									navLayout="around"
 									mode="single"
 									selected={startDate ?? undefined}
-									onSelect={handleSingleDateChange}
+									onSelect={
+										datePickerMode === "week"
+											? handleWeekDateChange
+											: handleSingleDateChange
+									}
 									month={visibleMonth}
 									onMonthChange={setVisibleMonth}
 									showOutsideDays

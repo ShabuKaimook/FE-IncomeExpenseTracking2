@@ -9,9 +9,24 @@ import {
 	getPreviousMonthDateRange,
 } from "@/shared/utils/date";
 
-export const SavingRateDashboardCard = () => {
-	const thisMonthRange = getCurrentMonthDateRange();
-	const lastMonthRange = getPreviousMonthDateRange();
+interface DateRange {
+	startDate: Date;
+	endDate: Date;
+}
+
+interface SavingRateDashboardCardProps {
+	period?: DateRange;
+	previousPeriod?: DateRange;
+	trendLabel?: string;
+}
+
+export const SavingRateDashboardCard = ({
+	period,
+	previousPeriod,
+	trendLabel = "from last month",
+}: SavingRateDashboardCardProps) => {
+	const thisMonthRange = period ?? getCurrentMonthDateRange();
+	const lastMonthRange = previousPeriod ?? getPreviousMonthDateRange();
 
 	const {
 		savingRate,
@@ -56,7 +71,7 @@ export const SavingRateDashboardCard = () => {
 					{isThisLoading || isLastMonthLoading ? (
 						<Skeleton className="h-4 w-36" label="Loading saving trend" />
 					) : (
-						<span>{`${(savingRate - lastMonthSavingRate).toFixed(2)}% from last month`}</span>
+						<span>{`${(savingRate - lastMonthSavingRate).toFixed(2)}% ${trendLabel}`}</span>
 					)}
 				</div>
 			}
