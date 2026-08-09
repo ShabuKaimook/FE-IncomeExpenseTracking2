@@ -5,6 +5,7 @@ import {
 	ResponsiveContainer,
 	Tooltip,
 } from "recharts";
+import { formatNumber } from "@/shared/utils/FormatMoney";
 
 function hash(str: string) {
 	let h = 0;
@@ -50,7 +51,8 @@ export function PieChart({
 	if (data.length === 0) {
 		return (
 			<div
-				className={`flex w-full h-[${height}px] items-center justify-center`}
+				className="flex w-full items-center justify-center"
+				style={{ height }}
 			>
 				<span className="text-muted-foreground">No data available</span>
 			</div>
@@ -63,7 +65,10 @@ export function PieChart({
 		colors?.[index] ?? colorFromName(entry.name);
 
 	return (
-		<div className="flex items-center gap-4" style={{ width }}>
+		<div
+			className="flex flex-col items-center gap-4 lg:flex-row"
+			style={{ width }}
+		>
 			<div className="shrink-0" style={{ width: chartSize, height: chartSize }}>
 				<ResponsiveContainer width="100%" height="100%">
 					<RechartsPieChart>
@@ -84,7 +89,7 @@ export function PieChart({
 						</Pie>
 						<Tooltip
 							formatter={(value, name) => [
-								`${value} (${formatPercent(Number(value), total)})`,
+								`${formatNumber(Number(value))} (${formatPercent(Number(value), total)})`,
 								name,
 							]}
 						/>
@@ -92,7 +97,7 @@ export function PieChart({
 				</ResponsiveContainer>
 			</div>
 
-			<div className="min-w-0 flex-1 space-y-2">
+			<div className="w-full max-w-[300px] min-w-0 flex-1 space-y-2 lg:max-w-none lg:w-auto">
 				{data.slice(0, maxLegendItems).map((entry, index) => (
 					<div key={entry.name} className="flex items-center gap-2">
 						<div

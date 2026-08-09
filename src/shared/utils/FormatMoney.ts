@@ -27,3 +27,8 @@ export const formatMoney = (amount: number, currency: string) => {
 
 	return `${symbol}${formattedAmount}${amountSuffix}`;
 };
+
+export const formatNumber = (amount: number) =>
+	new Intl.NumberFormat("en-US", {
+		maximumFractionDigits: 2,
+	}).format(amount);

@@ -1,6 +1,8 @@
 import type { PeriodMode } from "@/shared/constants/Period";
 import type { Period } from "@/shared/types/Period";
 
+export type TransactionSummaryPeriodMode = "day" | "week" | "month";
+
 export interface CreateTransactionRequest {
 	amount: number;
 	currency_code: "THB" | "USD";
@@ -80,6 +82,19 @@ export interface GetUserExpenseSummaryRequest {
 	period_mode: PeriodMode;
 	periods: Period[];
 }
+
+export interface GetTransactionBalanceSummaryRequest {
+	period_mode: TransactionSummaryPeriodMode;
+	periods: {
+		start_date: string;
+		end_date: string;
+	}[];
+}
+
+export type GetTransactionIncomeSummaryRequest =
+	GetTransactionBalanceSummaryRequest;
+
+export type GetTransactionSummaryRequest = GetTransactionBalanceSummaryRequest;
 
 export interface GetUserSavingRateRequest {
 	periods: Period[];

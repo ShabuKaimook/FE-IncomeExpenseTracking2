@@ -51,11 +51,7 @@ const Navbar = ({ navbarHeight }: NavbarProps) => {
 	return (
 		<>
 			{isFixed && (
-				<div
-					aria-hidden
-					style={{ height: navbarHeight }}
-					className="mb-4"
-				/>
+				<div aria-hidden style={{ height: navbarHeight }} className="mb-4" />
 			)}
 
 			<nav
@@ -83,9 +79,7 @@ const Navbar = ({ navbarHeight }: NavbarProps) => {
 						<div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
 							<span>{user?.displayName}</span>
 						</div>
-					) : (
-						null
-					)}
+					) : null}
 
 					<Sidebar />
 				</div>
@@ -101,12 +95,19 @@ function getPageTitle(pathname: string) {
 		return "New transaction";
 	}
 
-	if (pathname.startsWith("/transaction") || pathname.startsWith("/transactions")) {
+	if (
+		pathname.startsWith("/transaction") ||
+		pathname.startsWith("/transactions")
+	) {
 		return "Transaction";
 	}
 
 	if (pathname.startsWith("/category")) {
 		return "Category";
+	}
+
+	if (pathname.startsWith("/analytic")) {
+		return "Analytic";
 	}
 
 	if (pathname.startsWith("/login")) {
