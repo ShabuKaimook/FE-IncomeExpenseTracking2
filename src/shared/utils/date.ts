@@ -50,11 +50,20 @@ export const stringToDate = (dateValue: string) => {
 	return new Date(year, month - 1, date);
 };
 
+export const formatShortDate = (date: Date) =>
+	date.toLocaleDateString("en-US", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+	});
+
+export const formatShortDateRange = (startDate: Date, endDate: Date) =>
+	`${formatShortDate(startDate)} - ${formatShortDate(endDate)}`;
+
 export function getWeekDateRange(date: Date) {
 	const day = date.getDay();
-	const daysSinceMonday = day === 0 ? 6 : day - 1;
 	const startDate = new Date(date);
-	startDate.setDate(date.getDate() - daysSinceMonday);
+	startDate.setDate(date.getDate() - day);
 	startDate.setHours(0, 0, 0, 0);
 
 	const endDate = new Date(startDate);

@@ -16,6 +16,19 @@ export interface GetUserTransactionSummaryResponse {
 	total_amount: number;
 }
 
+export interface GetTransactionBalanceSummaryResponse {
+	start_date: string;
+	end_date: string;
+	income: number;
+	expense: number;
+	net_balance: number;
+}
+
+export type GetTransactionIncomeSummaryResponse =
+	GetUserTransactionSummaryResponse;
+
+export type GetTransactionSummaryResponse = GetUserTransactionSummaryResponse;
+
 export interface GetUserSavingRateResponse {
 	saving_rate: number;
 }
