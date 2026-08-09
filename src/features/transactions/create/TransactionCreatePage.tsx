@@ -93,6 +93,19 @@ const getStoredEditTransaction = (
   }
 };
 
+const getInitialEditState = (): {
+  transactionId: string | null;
+  transaction: Transaction | null;
+} => {
+  const transactionId = getEditTransactionId();
+  const transaction = getStoredEditTransaction(transactionId);
+
+  return {
+    transactionId: transaction ? transactionId : null,
+    transaction,
+  };
+};
+
 const fieldClassName =
   "h-11 w-full rounded-lg border border-(--line) bg-(--surface) px-3 text-sm font-medium text-foreground outline-none transition placeholder:text-muted-foreground/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/15";
 
@@ -108,7 +121,8 @@ export default function TransactionCreatePage() {
   const [form, setForm] = useState<FormState>(getInitialForm);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-  const [editTransactionId] = useState(getEditTransactionId);
+  const [{ transactionId: editTransactionId, transaction: editTransaction }] =
+    useState(getInitialEditState);
   const { categories, isLoading: isCategoryLoading } =
     useUserTransactionCategories();
   const createTransaction = useCreateTransaction();
@@ -143,20 +157,19 @@ export default function TransactionCreatePage() {
   );
 
   useEffect(() => {
-    const transaction = getStoredEditTransaction(editTransactionId);
-    if (!transaction) {
+    if (!editTransaction) {
       return;
     }
 
     setMode("manual");
     setForm({
-      amount: String(transaction.amount),
-      currencyCode: transaction.currency === "USD" ? "USD" : "THB",
-      description: transaction.description,
-      date: transaction.date,
-      userTransactionCategoryId: transaction.userTransactionCategoryId,
+      amount: String(editTransaction.amount),
+      currencyCode: editTransaction.currency === "USD" ? "USD" : "THB",
+      description: editTransaction.description,
+      date: editTransaction.date,
+      userTransactionCategoryId: editTransaction.userTransactionCategoryId,
     });
-  }, [editTransactionId]);
+  }, [editTransaction]);
 
   useEffect(() => {
     return () => {
