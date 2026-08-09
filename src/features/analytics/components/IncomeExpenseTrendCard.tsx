@@ -1,48 +1,28 @@
-import { CalendarDays, ChartColumnBig } from "lucide-react";
+import { ChartColumnBig } from "lucide-react";
 import {
+	getCompactMonthPeriodLabel,
 	getPeriodKey,
-	getTrendDescription,
+	isMonthPeriod,
 	type TrendMode,
 	type TrendPeriod,
 } from "@/features/analytics/utils/trendPeriods";
 import type { GetTransactionBalanceSummaryResponse } from "@/features/transactions/api/TransactionResponse";
-import { BarChart } from "@/shared/charts/BarChart";
-import CustomSegmentedControl, {
-	type CustomSegmentedControlOption,
-} from "@/shared/components/CustomSegmentedControl";
+import { HorizontalBarChart } from "@/shared/charts/HorizontalBarChart";
 import { DashboardCard } from "@/shared/components/DashboardCard";
-import {
-	type DatePickerRange,
-	DateRangeWithShowDisabledNavigation,
-} from "@/shared/components/DatePicker";
 import { ChartSkeleton } from "@/shared/components/Skeleton";
 import { ChartTheme } from "@/shared/constants/ChartThemeEnum";
 import { formatMoney, formatNumber } from "@/shared/utils/FormatMoney";
 
-const trendModeOptions: readonly CustomSegmentedControlOption<TrendMode>[] = [
-	{ label: "7D", value: "day" },
-	{ label: "4W", value: "week" },
-	{ label: "12M", value: "month" },
-] as const;
-
 export function IncomeExpenseTrendCard({
 	mode,
-	onModeChange,
 	periods,
 	summaries,
 	isLoading,
-	customDate,
-	onCustomDateChange,
-	onCustomRangeChange,
 }: {
 	mode: TrendMode;
-	onModeChange: (mode: TrendMode) => void;
 	periods: TrendPeriod[];
 	summaries: GetTransactionBalanceSummaryResponse[];
 	isLoading: boolean;
-	customDate: Date | null;
-	onCustomDateChange: (date: Date | null) => void;
-	onCustomRangeChange: (range: DatePickerRange) => void;
 }) {
 	const summariesByPeriod = new Map(
 		summaries.map((summary) => [
@@ -50,15 +30,23 @@ export function IncomeExpenseTrendCard({
 			summary,
 		]),
 	);
-	const data = periods.map((period) => {
+	const data = periods.map((period, index) => {
 		const summary = summariesByPeriod.get(getPeriodKey(period));
+		const periodLabel = isMonthPeriod(period)
+			? getCompactMonthPeriodLabel(period, periods)
+			: period.label;
 
 		return {
-			period: period.label,
+			period: mode === "week" ? `Week ${index + 1}` : periodLabel,
+			dateRange: period.label,
 			income: summary?.income ?? 0,
 			expense: summary?.expense ?? 0,
 		};
 	});
+	const hasChartData = data.some(
+		(period) => period.income > 0 || period.expense > 0,
+	);
+	const chartHeight = hasChartData ? Math.max(280, data.length * 52) : 200;
 
 	return (
 		<DashboardCard
@@ -66,50 +54,13 @@ export function IncomeExpenseTrendCard({
 				icon: <ChartColumnBig size={16} className="text-primary" />,
 				title: "INCOME VS EXPENSE",
 			}}
-			rightSide={
-				<div className="flex items-center gap-2">
-					<CustomSegmentedControl
-						ariaLabel="Income expense trend period"
-						value={mode}
-						options={trendModeOptions}
-						onValueChange={onModeChange}
-						className="h-9!"
-					/>
-					<DateRangeWithShowDisabledNavigation
-						mode="custom"
-						value={customDate}
-						onChange={onCustomDateChange}
-						onRangeChange={(range) => {
-							onModeChange("custom");
-							onCustomRangeChange(range);
-						}}
-						className={`h-9! w-9! justify-center px-0! sm:w-9! ${
-							mode === "custom"
-								? "bg-primary! text-primary-foreground hover:bg-primary/90!"
-								: ""
-						}`}
-						hideTriggerLabel
-						triggerIcon={
-							<CalendarDays
-								size={17}
-								className={
-									mode === "custom" ? "text-primary-foreground" : "text-primary"
-								}
-							/>
-						}
-					/>
-				</div>
-			}
 		>
-			<p className="text-xs text-muted-foreground lg:text-sm">
-				{getTrendDescription(mode, periods)}
-			</p>
 			{isLoading ? (
-				<ChartSkeleton height={280} />
+				<ChartSkeleton height={chartHeight} />
 			) : (
-				<BarChart
-					data={data}
-					xKey="period"
+				<HorizontalBarChart
+					data={hasChartData ? data : []}
+					yKey="period"
 					bars={[
 						{
 							dataKey: "income",
@@ -124,12 +75,17 @@ export function IncomeExpenseTrendCard({
 							gradient: true,
 						},
 					]}
-					height={280}
-					showGrid
-					showLabels
-					showYAxis
+					height={chartHeight}
+					barSize={16}
 					valueFormatter={(value) => formatMoney(value, "THB")}
 					tooltipValueFormatter={formatNumber}
+					tooltipLabelFormatter={(label, payload) => {
+						const dateRange = (
+							payload[0] as { payload?: { dateRange?: string } }
+						)?.payload?.dateRange;
+
+						return dateRange ? `${label}: ${dateRange}` : String(label);
+					}}
 					legendVerticalAlign="bottom"
 				/>
 			)}

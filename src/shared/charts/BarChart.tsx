@@ -87,7 +87,8 @@ export function BarChart<T extends Record<string, unknown>>({
 	if (data.length === 0) {
 		return (
 			<div
-				className={`flex w-full h-[${height}px] items-center justify-center`}
+				className="flex w-full items-center justify-center"
+				style={{ height }}
 			>
 				<span className="text-muted-foreground">No data available</span>
 			</div>

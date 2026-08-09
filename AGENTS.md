@@ -21,6 +21,9 @@ Build memorable, functional interfaces with a clear aesthetic direction (no gene
 ### Component placement
 - Keep page files focused on route-level state, data fetching, and layout. Move component-shaped functions into the nearest feature `components/` folder once they have their own props or meaningful rendering logic.
 
+### Change summary
+- When finishing code changes, mention each file touched and briefly say what changed there.
+
 ### 1) Define intent and aesthetic
 - Ask for: target users, tone (brutalist, editorial, neon, soft craft, industrial, etc.), content types (cards, forms, charts), performance constraints.
 - Pick a single memorable gesture and stick to it. Avoid mixed-font chaos unless the style calls for it.

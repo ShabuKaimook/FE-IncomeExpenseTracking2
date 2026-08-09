@@ -5,7 +5,7 @@ import {
 	UI,
 } from "@daypicker/react";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { type CSSProperties, useEffect, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
 import "@daypicker/react/style.css";
 import { DropdownMenu } from "@radix-ui/themes";
 import CustomSegmentedControl from "@/shared/components/CustomSegmentedControl";
@@ -28,6 +28,7 @@ export type DatePickerRange = {
 export interface DatePickerProps {
 	mode?: DatePickerMode;
 	value: Date | null;
+	rangeValue?: DatePickerRange;
 	onChange: (date: Date | null) => void;
 	onRangeChange?: (range: DatePickerRange) => void;
 	modeOptions?: readonly {
@@ -36,15 +37,13 @@ export interface DatePickerProps {
 	}[];
 	className?: string;
 	hideTriggerLabel?: boolean;
-	triggerIcon?: React.ReactNode;
+	triggerIcon?: ReactNode;
+	canSelectMultipleMonths?: boolean;
 }
 
 // STYLES
 const headerButtonClassName =
 	"inline-flex size-7 items-center justify-center rounded-lg text-primary-foreground transition hover:bg-primary-foreground/15 disabled:cursor-not-allowed disabled:opacity-40";
-
-const calendarSurfaceClassName =
-	"overflow-hidden rounded-lg border border-(--line) bg-popover shadow-sm";
 
 const dayPickerClassNames = {
 	[UI.Weekday]: "h-5 text-xs font-medium text-muted-foreground",
@@ -80,6 +79,13 @@ const weekRangeModifierClassNames = {
 	week_range_end:
 		"rounded-r-lg bg-primary/10 [&>button]:rounded-l-none [&>button]:rounded-r-lg [&>button]:!bg-primary [&>button]:text-primary-foreground",
 };
+
+type CustomPickerMode = "day" | "month";
+
+const customPickerModeOptions = [
+	{ label: "Day", value: "day" },
+	{ label: "Month", value: "month" },
+] as const;
 
 const datePickerModeOptions: {
 	label: string;
@@ -124,15 +130,49 @@ const isSameDate = (leftDate: Date, rightDate: Date) =>
 const isBetweenDates = (date: Date, startDate: Date, endDate: Date) =>
 	date.getTime() > startDate.getTime() && date.getTime() < endDate.getTime();
 
+const formatShortMonth = (date: Date) =>
+	date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+
+const formatCustomMonthRange = (startDate: Date, endDate: Date) => {
+	if (startDate.getFullYear() === endDate.getFullYear()) {
+		return `${startDate.toLocaleDateString("en-US", { month: "short" })} - ${formatShortMonth(endDate)}`;
+	}
+
+	return `${formatShortMonth(startDate)} - ${formatShortMonth(endDate)}`;
+};
+
+const getMonthIndex = (date: Date) => date.getFullYear() * 12 + date.getMonth();
+
+const isBetweenMonths = (
+	month: number,
+	visibleYear: number,
+	range: DatePickerRange,
+) => {
+	if (!range.startDate || !range.endDate) {
+		return false;
+	}
+
+	const monthIndex = visibleYear * 12 + month;
+	const startMonthIndex = getMonthIndex(range.startDate);
+	const endMonthIndex = getMonthIndex(range.endDate);
+
+	return (
+		monthIndex > Math.min(startMonthIndex, endMonthIndex) &&
+		monthIndex < Math.max(startMonthIndex, endMonthIndex)
+	);
+};
+
 export const DateRangeWithShowDisabledNavigation = ({
 	mode,
 	value,
+	rangeValue,
 	onChange,
 	onRangeChange,
 	modeOptions,
 	className = "",
 	hideTriggerLabel = false,
 	triggerIcon,
+	canSelectMultipleMonths = false,
 }: DatePickerProps) => {
 	const [datePickerMode, setDatePickerMode] = useState<DatePickerMode>(
 		mode ?? "month",
@@ -149,12 +189,25 @@ export const DateRangeWithShowDisabledNavigation = ({
 		startDate: Date;
 		endDate: Date;
 	} | null>(null);
+	const [customPickerMode, setCustomPickerMode] =
+		useState<CustomPickerMode>("day");
 	const visibleYear = visibleMonth.getFullYear();
 	const weekRange =
 		datePickerMode === "week"
 			? (hoveredWeekRange ??
 				(startDate && endDate ? { startDate, endDate } : null))
 			: null;
+
+	useEffect(() => {
+		if (!rangeValue) {
+			return;
+		}
+
+		setDatePickerMode(rangeValue.mode);
+		setStartDate(rangeValue.startDate);
+		setEndDate(rangeValue.endDate);
+		setVisibleMonth(rangeValue.startDate ?? value ?? new Date());
+	}, [rangeValue, value]);
 
 	useEffect(() => {
 		if (!value || datePickerMode !== "month") {
@@ -191,6 +244,7 @@ export const DateRangeWithShowDisabledNavigation = ({
 	const handleModeChange = (mode: DatePickerMode) => {
 		setDatePickerMode(mode);
 		setHoveredWeekRange(null);
+		setCustomPickerMode("day");
 
 		if (mode === "month" && value) {
 			const monthRange = getMonthDateRange(value);
@@ -252,6 +306,37 @@ export const DateRangeWithShowDisabledNavigation = ({
 		}
 	};
 
+	const handleCustomMonthClick = (month: number) => {
+		const selectedMonthRange = getMonthDateRange(
+			new Date(visibleYear, month, 1),
+		);
+
+		if (!canSelectMultipleMonths || !startDate || endDate) {
+			setStartDate(selectedMonthRange.startDate);
+			setEndDate(null);
+			setVisibleMonth(selectedMonthRange.startDate);
+			onChange(selectedMonthRange.startDate);
+			emitRangeChange("custom", selectedMonthRange.startDate, null);
+			return;
+		}
+
+		const nextStartDate =
+			selectedMonthRange.startDate < startDate
+				? selectedMonthRange.startDate
+				: startDate;
+		const nextEndDate =
+			selectedMonthRange.endDate < startDate
+				? getMonthDateRange(startDate).endDate
+				: selectedMonthRange.endDate;
+
+		setStartDate(nextStartDate);
+		setEndDate(nextEndDate);
+		setVisibleMonth(nextStartDate);
+		onChange(nextStartDate);
+		emitRangeChange("custom", nextStartDate, nextEndDate);
+		setIsOpen(false);
+	};
+
 	const handleSingleDateChange = (date: Date | undefined) => {
 		const nextDate = date ?? null;
 		setStartDate(nextDate);
@@ -307,6 +392,63 @@ export const DateRangeWithShowDisabledNavigation = ({
 		handleMonthChange(selectedMonthDate);
 	};
 
+	const renderMonthPicker = ({
+		onMonthClick,
+		isMonthSelected,
+		isMonthInRange,
+	}: {
+		onMonthClick: (month: number) => void;
+		isMonthSelected: (month: number) => boolean;
+		isMonthInRange?: (month: number) => boolean;
+	}) => (
+		<div>
+			<div className="flex h-10 items-center justify-between bg-primary px-3">
+				<button
+					type="button"
+					className={headerButtonClassName}
+					onClick={goToPreviousYear}
+					aria-label="Previous year"
+				>
+					<ChevronLeft size={16} strokeWidth={2.5} />
+				</button>
+				<span className="text-sm font-semibold text-primary-foreground">
+					{visibleYear}
+				</span>
+				<button
+					type="button"
+					className={headerButtonClassName}
+					onClick={goToNextYear}
+					aria-label="Next year"
+				>
+					<ChevronRight size={16} strokeWidth={2.5} />
+				</button>
+			</div>
+			<div className="grid w-45 grid-cols-3 gap-2 p-2">
+				{getAllMonthShortNames.map((monthName, month) => {
+					const isSelected = isMonthSelected(month);
+					const isInRange = isMonthInRange?.(month) ?? false;
+
+					return (
+						<button
+							key={monthName}
+							type="button"
+							className={`h-7 whitespace-nowrap rounded-lg border-2 text-sm transition ${
+								isSelected
+									? "border-primary bg-primary text-primary-foreground"
+									: isInRange
+										? "border-transparent bg-primary/10 text-(--sea-ink)"
+										: "border-transparent text-(--sea-ink-soft) hover:bg-primary/30 hover:text-(--sea-ink)"
+							}`}
+							onClick={() => onMonthClick(month)}
+						>
+							{monthName}
+						</button>
+					);
+				})}
+			</div>
+		</div>
+	);
+
 	const triggerLabel =
 		datePickerMode === "month"
 			? (value?.toLocaleDateString("en-US", {
@@ -319,9 +461,13 @@ export const DateRangeWithShowDisabledNavigation = ({
 					? startDate
 						? formatShortDate(startDate)
 						: "Select date"
-					: startDate && endDate
-						? formatShortDateRange(startDate, endDate)
-						: "Select date range";
+					: customPickerMode === "month" && startDate
+						? endDate
+							? formatCustomMonthRange(startDate, endDate)
+							: formatShortMonth(startDate)
+						: startDate && endDate
+							? formatShortDateRange(startDate, endDate)
+							: "Select date range";
 
 	return (
 		<div className="flex flex-col sm:flex-row w-full items-center gap-2">
@@ -359,51 +505,12 @@ export const DateRangeWithShowDisabledNavigation = ({
 				>
 					<div>
 						{datePickerMode === "month" ? (
-							<div className={calendarSurfaceClassName}>
-								<div className="flex h-10 items-center justify-between bg-primary px-3">
-									<button
-										type="button"
-										className={headerButtonClassName}
-										onClick={goToPreviousYear}
-										aria-label="Previous year"
-									>
-										<ChevronLeft size={16} strokeWidth={2.5} />
-									</button>
-									<span className="text-sm font-semibold text-primary-foreground">
-										{visibleYear}
-									</span>
-									<button
-										type="button"
-										className={headerButtonClassName}
-										onClick={goToNextYear}
-										aria-label="Next year"
-									>
-										<ChevronRight size={16} strokeWidth={2.5} />
-									</button>
-								</div>
-								<div className="grid w-45 grid-cols-3 gap-2 p-2">
-									{getAllMonthShortNames.map((monthName, month) => {
-										const isSelected =
-											value?.getFullYear() === visibleYear &&
-											value.getMonth() === month;
-
-										return (
-											<button
-												key={monthName}
-												type="button"
-												className={`h-7 whitespace-nowrap rounded-lg text-sm transition ${
-													isSelected
-														? "bg-primary text-primary-foreground"
-														: "text-(--sea-ink-soft) hover:bg-primary/30 hover:text-(--sea-ink)"
-												}`}
-												onClick={() => handleMonthButtonClick(month)}
-											>
-												{monthName}
-											</button>
-										);
-									})}
-								</div>
-							</div>
+							renderMonthPicker({
+								onMonthClick: handleMonthButtonClick,
+								isMonthSelected: (month) =>
+									value?.getFullYear() === visibleYear &&
+									value.getMonth() === month,
+							})
 						) : datePickerMode === "single" || datePickerMode === "week" ? (
 							<div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
 								<DayPicker
@@ -452,24 +559,52 @@ export const DateRangeWithShowDisabledNavigation = ({
 								/>
 							</div>
 						) : (
-							<div className="rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
-								<DayPicker
-									animate
-									captionLayout="label"
-									navLayout="around"
-									mode="range"
-									selected={{
-										from: startDate ?? undefined,
-										to: endDate ?? undefined,
-									}}
-									onSelect={handleCustomRangeChange}
-									month={visibleMonth}
-									onMonthChange={setVisibleMonth}
-									showOutsideDays
-									resetOnSelect
-									classNames={dayPickerClassNames}
-									styles={dayPickerStyles}
-								/>
+							<div className="overflow-hidden rounded-lg border border-(--line) bg-popover text-(--sea-ink-soft)">
+								{customPickerMode === "month" ? (
+									renderMonthPicker({
+										onMonthClick: handleCustomMonthClick,
+										isMonthSelected: (month) =>
+											!!startDate &&
+											(getMonthIndex(startDate) === visibleYear * 12 + month ||
+												(!!endDate &&
+													getMonthIndex(endDate) === visibleYear * 12 + month)),
+										isMonthInRange: (month) =>
+											isBetweenMonths(month, visibleYear, {
+												mode: "custom",
+												startDate,
+												endDate,
+											}),
+									})
+								) : (
+									<DayPicker
+										animate
+										captionLayout="label"
+										navLayout="around"
+										mode="range"
+										selected={{
+											from: startDate ?? undefined,
+											to: endDate ?? undefined,
+										}}
+										onSelect={handleCustomRangeChange}
+										month={visibleMonth}
+										onMonthChange={setVisibleMonth}
+										showOutsideDays
+										resetOnSelect
+										classNames={dayPickerClassNames}
+										styles={dayPickerStyles}
+									/>
+								)}
+								{canSelectMultipleMonths && (
+									<div className="border-t border-(--line) p-2">
+										<CustomSegmentedControl
+											ariaLabel="Custom date picker mode"
+											value={customPickerMode}
+											options={customPickerModeOptions}
+											onValueChange={setCustomPickerMode}
+											className="w-full"
+										/>
+									</div>
+								)}
 							</div>
 						)}
 					</div>
