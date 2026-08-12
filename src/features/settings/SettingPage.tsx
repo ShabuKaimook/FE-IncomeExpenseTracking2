@@ -9,7 +9,7 @@ const discordStateKey = "discord-link-state";
 const settingPath = "/setting";
 
 function getRedirectUri() {
-	return `${window.location.origin}${settingPath}`;
+	return env.DISCORD_REDIRECT_URI;
 }
 
 function buildDiscordOAuthUrl() {
@@ -19,7 +19,7 @@ function buildDiscordOAuthUrl() {
 	window.sessionStorage.setItem(discordStateKey, state);
 
 	const params = new URLSearchParams({
-		client_id: env.DISCORD_CLIENT_ID ?? "",
+		client_id: env.DISCORD_CLIENT_ID,
 		response_type: "code",
 		redirect_uri: redirectUri,
 		scope: "identify",
@@ -61,7 +61,7 @@ export default function SettingPage() {
 			.finally(() => setIsLinking(false));
 	}, [updateUser]);
 
-	const canLinkDiscord = !!env.DISCORD_CLIENT_ID;
+	const canLinkDiscord = !!env.DISCORD_CLIENT_ID && !!env.DISCORD_REDIRECT_URI;
 
 	return (
 		<div className="mx-auto flex min-h-[55vh] w-full max-w-xl flex-col justify-center gap-5">
@@ -92,7 +92,8 @@ export default function SettingPage() {
 
 				{!canLinkDiscord ? (
 					<p className="mt-3 text-sm text-muted-foreground">
-						Add VITE_DISCORD_CLIENT_ID to enable Discord linking.
+						Add VITE_DISCORD_CLIENT_ID and VITE_DISCORD_REDIRECT_URI to enable
+						Discord linking.
 					</p>
 				) : null}
 			</section>
