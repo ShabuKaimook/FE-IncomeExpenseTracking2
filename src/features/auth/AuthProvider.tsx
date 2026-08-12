@@ -17,6 +17,7 @@ type AuthContextValue = {
 	isLoading: boolean;
 	isAuthenticated: boolean;
 	completeLogin: (accessToken: string, user: AuthUser) => void;
+	updateUser: (user: AuthUser) => void;
 	logout: () => void;
 };
 
@@ -63,6 +64,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		setUser(nextUser);
 	}, []);
 
+	const updateUser = useCallback((nextUser: AuthUser) => {
+		setUser(nextUser);
+	}, []);
+
 	const logout = useCallback(() => {
 		clearAuthToken();
 		setUser(null);
@@ -74,9 +79,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			isLoading,
 			isAuthenticated: !!user,
 			completeLogin,
+			updateUser,
 			logout,
 		}),
-		[user, isLoading, completeLogin, logout],
+		[user, isLoading, completeLogin, updateUser, logout],
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

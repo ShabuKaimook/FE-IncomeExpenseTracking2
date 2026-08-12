@@ -110,6 +110,10 @@ function getPageTitle(pathname: string) {
 		return "Analytic";
 	}
 
+	if (pathname.startsWith("/setting")) {
+		return "Setting";
+	}
+
 	if (pathname.startsWith("/login")) {
 		return "Login";
 	}

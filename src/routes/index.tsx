@@ -5,6 +5,7 @@ import LoginPage from "@/features/auth/LoginPage";
 import { RedirectIfAuthenticated } from "@/features/auth/RedirectIfAuthenticated";
 import { RequireAuth } from "@/features/auth/RequireAuth";
 import DashboardPage from "@/features/dashboard/DashboardPage";
+import SettingPage from "@/features/settings/SettingPage";
 import TransactionCreatePage from "@/features/transactions/create/TransactionCreatePage";
 import TransactionPage from "@/features/transactions/TransactionPage";
 import CategoryPage from "@/features/userTransactionCategories/CategoryPage";
@@ -60,6 +61,16 @@ const analyticRoute = createRoute({
 	),
 });
 
+const settingRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/setting",
+	component: () => (
+		<RequireAuth>
+			<SettingPage />
+		</RequireAuth>
+	),
+});
+
 const loginRoute = createRoute({
 	getParentRoute: () => rootRoute,
 	path: "/login",
@@ -88,6 +99,7 @@ export const routeTree = rootRoute.addChildren([
 	transactionCreateRoute,
 	categoryRoute,
 	analyticRoute,
+	settingRoute,
 	loginRoute,
 	authCallbackRoute,
 	lineAuthCallbackRoute,

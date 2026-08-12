@@ -1,6 +1,7 @@
 export type AuthUser = {
 	userId: string;
 	lineUserId: string;
+	discordId?: string | null;
 	displayName: string;
 };
 
@@ -10,5 +11,9 @@ export type LineCallbackResponse = {
 };
 
 export type MeResponse = {
+	user: AuthUser;
+};
+
+export type LinkDiscordResponse = {
 	user: AuthUser;
 };

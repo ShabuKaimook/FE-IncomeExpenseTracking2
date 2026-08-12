@@ -1,5 +1,9 @@
 import { axiosInstance } from "@/shared/api/AxiosInstance";
-import type { LineCallbackResponse, MeResponse } from "./AuthResponse";
+import type {
+	LineCallbackResponse,
+	LinkDiscordResponse,
+	MeResponse,
+} from "./AuthResponse";
 
 export const AuthService = {
 	signInWithLine: async (
@@ -19,6 +23,21 @@ export const AuthService = {
 
 	me: async (): Promise<MeResponse> => {
 		const response = await axiosInstance.get<MeResponse>("/auth/me");
+		return response.data;
+	},
+
+	linkDiscord: async (
+		code: string,
+		redirectUri: string,
+	): Promise<LinkDiscordResponse> => {
+		const response = await axiosInstance.post<LinkDiscordResponse>(
+			"/auth/discord/link",
+			{
+				code,
+				redirect_uri: redirectUri,
+			},
+		);
+
 		return response.data;
 	},
 };
