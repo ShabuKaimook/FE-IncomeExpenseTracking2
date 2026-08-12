@@ -121,6 +121,7 @@ export default function TransactionCreatePage() {
   const [form, setForm] = useState<FormState>(getInitialForm);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [draftTransactionId] = useState(getEditTransactionId);
   const [{ transactionId: editTransactionId, transaction: editTransaction }] =
     useState(getInitialEditState);
   const { categories, isLoading: isCategoryLoading } =
@@ -253,6 +254,9 @@ export default function TransactionCreatePage() {
     }
 
     const payload: CreateTransactionRequest = {
+      ...(!isEditMode && draftTransactionId
+        ? { transaction_id: draftTransactionId }
+        : {}),
       amount,
       currency_code: form.currencyCode,
       description: form.description.trim(),

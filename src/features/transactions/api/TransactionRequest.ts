@@ -4,6 +4,7 @@ import type { Period } from "@/shared/types/Period";
 export type TransactionSummaryPeriodMode = "day" | "week" | "month";
 
 export interface CreateTransactionRequest {
+	transaction_id?: string;
 	amount: number;
 	currency_code: "THB" | "USD";
 	description: string;
