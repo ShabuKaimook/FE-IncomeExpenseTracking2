@@ -1,4 +1,4 @@
-import { Link2 } from "lucide-react";
+import { CheckCircle2, Link2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { AuthService } from "@/features/auth/api/AuthService";
@@ -32,6 +32,7 @@ function buildDiscordOAuthUrl() {
 export default function SettingPage() {
 	const { user, updateUser } = useAuth();
 	const [isLinking, setIsLinking] = useState(false);
+	const isDiscordLinked = !!user?.discordId;
 
 	useEffect(() => {
 		const callbackUrl = new URL(window.location.href);
@@ -61,8 +62,6 @@ export default function SettingPage() {
 			.finally(() => setIsLinking(false));
 	}, [updateUser]);
 
-	const canLinkDiscord = !!env.DISCORD_CLIENT_ID && !!env.DISCORD_REDIRECT_URI;
-
 	return (
 		<div className="mx-auto flex min-h-[55vh] w-full max-w-xl flex-col justify-center gap-5">
 			<section className="island-shell rise-in rounded-xl p-5 sm:p-6">
@@ -78,24 +77,17 @@ export default function SettingPage() {
 
 				<button
 					type="button"
-					disabled={!canLinkDiscord || isLinking}
+					disabled={isDiscordLinked || isLinking}
 					onClick={() => window.location.assign(buildDiscordOAuthUrl())}
-					className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#5865F2] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-[#4752C4] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+					className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#5865F2] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-[#4752C4] disabled:cursor-default disabled:bg-emerald-600 disabled:opacity-90 sm:w-auto"
 				>
-					<Link2 size={18} />
+					{isDiscordLinked ? <CheckCircle2 size={18} /> : <Link2 size={18} />}
 					{isLinking
 						? "Linking Discord..."
-						: user?.discordId
-							? "Relink Discord"
+						: isDiscordLinked
+							? "Already linked"
 							: "Link Discord"}
 				</button>
-
-				{!canLinkDiscord ? (
-					<p className="mt-3 text-sm text-muted-foreground">
-						Add VITE_DISCORD_CLIENT_ID and VITE_DISCORD_REDIRECT_URI to enable
-						Discord linking.
-					</p>
-				) : null}
 			</section>
 		</div>
 	);
